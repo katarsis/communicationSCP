@@ -1,6 +1,9 @@
 package com.glowbyte.biis.domain;
 
+import java.text.ParseException;
 import java.util.Date;
+
+import com.glowbyte.biis.utils.GeneralUtils;
 
 public class HistoryItem {
 
@@ -39,6 +42,14 @@ public class HistoryItem {
 	}
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public HistoryItem (String ctn, String date, String contactType, String contactSource, String id) throws ParseException{
+		this.CTN = ctn;
+		this.contactDate = GeneralUtils.getDateFromString(date);
+		this.contactType = Integer.valueOf(contactType);
+		this.contactSource = contactSource;
+		this.id = Integer.valueOf(id);
 	}
 	
 }

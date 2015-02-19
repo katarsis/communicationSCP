@@ -7,8 +7,8 @@ import com.glowbyte.biis.domain.HistoryItem;
 
 public interface ContactHistoryDAO {
 	
-	public List<HistoryItem> getContactHistoryByCTN(String ctn);
+	public List<HistoryItem> getContactHistoryByCTN(String ctn) throws Exception;
 	
-	public List<HistoryItem> getHistoryByClientAndTime(String ctn, Date startDate, Date endDate);
+	public List<HistoryItem> getHistoryByClientAndTime(String ctn, Date startDate, Date endDate) throws Exception;
 
 }

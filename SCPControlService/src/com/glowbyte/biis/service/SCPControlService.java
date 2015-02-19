@@ -32,16 +32,14 @@ public class SCPControlService {
 	@WebMethod
 	public int communicateSCP(String ctn, int camp_id, int type) throws Exception{
 		int result = COMMUNICATION_APPROVED;
-		CampaignsDAO campaignsDao = new CampaignsDAOImpl();
-		campaignsDao.getCampaignById(5001);
-		/*ComminictionPoliticsManager communicationPoliticsManager = null;
+		ComminictionPoliticsManager communicationPoliticsManager = null;
 		List<CommunicationRule> communicationRuleList =  communicationPoliticsManager.getAllCommunicationRules();
 		for(CommunicationRule rule : communicationRuleList){
 			if(!rule.checkRule(ctn, camp_id, type)){
 				result = COMMUNICATION_ABORTED;
 				break;
 			}
-		}*/
+		}
 		return result;
 	}
 }
