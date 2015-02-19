@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+	<servlet>
+		<servlet-name>SCPControlService</servlet-name>
+		<servlet-class>com.glowbyte.biis.service.SCPControlService</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SCPControlService</servlet-name>
+		<url-pattern>/communicationSCP</url-pattern>
+	</servlet-mapping>
+</web-app>
