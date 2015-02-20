@@ -29,7 +29,7 @@ public class ContactHistoryDAO {
 			
 			while (rs.next()) {
 				ContactHistoryRecord currentItem = new ContactHistoryRecord(rs.getString("ctn"),
-						rs.getString("contact_date"), rs.getString("contact_type"),rs.getString("contact_source"), "");
+						rs.getString("contact_date"), rs.getString("contact_type"),rs.getString("contact_source"), "",rs.getInt("camp_id"));
 				result.add(currentItem);
 			}
 		} catch (Exception e) {

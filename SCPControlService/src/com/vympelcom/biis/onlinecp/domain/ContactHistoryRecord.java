@@ -12,7 +12,14 @@ public class ContactHistoryRecord {
 	int contactType;
 	String contactSource;
 	int id;
+	int campaignId;
 	
+	public int getCampaignId() {
+		return campaignId;
+	}
+	public void setCampaignId(int campignId) {
+		this.campaignId = campignId;
+	}
 	public String getCTN() {
 		return CTN;
 	}
@@ -44,12 +51,13 @@ public class ContactHistoryRecord {
 		this.id = id;
 	}
 	
-	public ContactHistoryRecord (String ctn, String date, String contactType, String contactSource, String id) throws ParseException{
+	public ContactHistoryRecord (String ctn, String date, String contactType, String contactSource, String id, int campId) throws ParseException{
 		this.CTN = ctn;
 		this.contactDate = GeneralUtils.getDateFromString(date);
 		this.contactType = Integer.valueOf(contactType);
 		this.contactSource = contactSource;
 		this.id = Integer.valueOf(id);
+		this.campaignId = campId;
 	}
 	
 }

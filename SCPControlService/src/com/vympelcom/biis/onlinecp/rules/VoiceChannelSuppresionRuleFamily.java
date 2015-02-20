@@ -12,11 +12,19 @@ public class VoiceChannelSuppresionRuleFamily implements RuleFamily{
 	static final int VOICE_CONTACT_TYPE =1; 
 	
 	@Override
-	public CPCheckResult applyRuleFamily(String ctn, Campaign checkedCampaign,List<ContactHistoryRecord> previousContacts) {
-		if(lastCommunicationIsVoice(previousContacts.get(0)))
-		{
-			//Campaign lastCommunicationCampaign = CampaignsDAO.getCampaignById(previousContacts.get(0).)
+	public CPCheckResult applyRuleFamily(String ctn, Campaign checkedCampaign,List<ContactHistoryRecord> previousContacts)  {
+		
+
+		try {
+			if(lastCommunicationIsVoice(previousContacts.get(0)))
+			{
+				Campaign lastCommunicationCampaign = CampaignsDAO.getCampaignById(previousContacts.get(0).getCampaignId());
+				
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
+		
 		return null;
 	}
 	
