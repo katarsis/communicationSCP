@@ -1,9 +1,9 @@
-package com.glowbyte.biis.domain;
+package com.vympelcom.biis.onlinecp.domain;
 
 import java.text.ParseException;
 import java.util.Date;
 
-import com.glowbyte.biis.utils.GeneralUtils;
+import com.vympelcom.biis.onlinecp.utils.GeneralUtils;
 
 public class Campaign {
 	int id;

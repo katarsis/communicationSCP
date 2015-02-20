@@ -1,11 +1,11 @@
-package com.glowbyte.biis.domain;
+package com.vympelcom.biis.onlinecp.domain;
 
 import java.text.ParseException;
 import java.util.Date;
 
-import com.glowbyte.biis.utils.GeneralUtils;
+import com.vympelcom.biis.onlinecp.utils.GeneralUtils;
 
-public class HistoryItem {
+public class ContactHistoryRecord {
 
 	String CTN;
 	Date contactDate;
@@ -44,7 +44,7 @@ public class HistoryItem {
 		this.id = id;
 	}
 	
-	public HistoryItem (String ctn, String date, String contactType, String contactSource, String id) throws ParseException{
+	public ContactHistoryRecord (String ctn, String date, String contactType, String contactSource, String id) throws ParseException{
 		this.CTN = ctn;
 		this.contactDate = GeneralUtils.getDateFromString(date);
 		this.contactType = Integer.valueOf(contactType);

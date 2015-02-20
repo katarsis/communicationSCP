@@ -1,7 +1,8 @@
-package com.glowbyte.biis.utils;
+package com.vympelcom.biis.onlinecp.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class GeneralUtils {
@@ -26,6 +27,16 @@ public class GeneralUtils {
 		else 
 			resultDate =  formatFromDB.parse(dateString);
 		return resultDate;
+	}
+	
+	public static long getDateDifferenceInDay(Date startDay, Date endDay){
+		long result = -1;
+		long diff = endDay.getTime()-startDay.getTime();
+		/*Calendar calendar = Calendar.getInstance();
+	    calendar.setTime(diff);
+	    result = calendar.get(Calendar.DAY_OF_MONTH); */
+		result = diff / (1000 * 60 * 60 * 24);
+		return result;
 	}
 
 }

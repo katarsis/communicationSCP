@@ -2,7 +2,7 @@
 <web-app>
 	<servlet>
 		<servlet-name>SCPControlService</servlet-name>
-		<servlet-class>com.glowbyte.biis.service.SCPControlService</servlet-class>
+		<servlet-class>com.vympelcom.biis.onlinecp.service.SCPControlService</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>SCPControlService</servlet-name>

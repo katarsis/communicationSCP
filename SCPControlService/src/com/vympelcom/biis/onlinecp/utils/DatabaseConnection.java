@@ -1,4 +1,4 @@
-package com.glowbyte.biis.utils;
+package com.vympelcom.biis.onlinecp.utils;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;

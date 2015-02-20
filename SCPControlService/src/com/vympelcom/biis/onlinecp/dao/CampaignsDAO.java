@@ -1,4 +1,4 @@
-package com.glowbyte.biis.dao;
+package com.vympelcom.biis.onlinecp.dao;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -7,14 +7,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.glowbyte.biis.domain.Campaign;
-import com.glowbyte.biis.utils.DatabaseConnection;
+import com.vympelcom.biis.onlinecp.domain.Campaign;
+import com.vympelcom.biis.onlinecp.utils.DatabaseConnection;
 
-public class CampaignsDAOImpl implements CampaignsDAO{
+public class CampaignsDAO {
 
-	@Override
-	public List<Campaign> getCampaignById(int id) throws Exception {
-		List<Campaign> result = new ArrayList<Campaign>();
+	
+	public static Campaign getCampaignById(int id) throws Exception {
+		Campaign result = null;
 		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
 		Connection connection=null;
 		try{
@@ -24,11 +24,10 @@ public class CampaignsDAOImpl implements CampaignsDAO{
 			ResultSet rs = callstmt.executeQuery();
 			
 			while (rs.next()) {
-				Campaign currentCamaign = new Campaign(	rs.getString("camp_id"), 
+				result = new Campaign(	rs.getString("camp_id"), 
 														rs.getString("camp_type"), 
 														rs.getString("inform_date"),
 														rs.getString("offer_date"));  
-				result.add(currentCamaign);
 			}
 		}catch(SQLException exp)
 		{
