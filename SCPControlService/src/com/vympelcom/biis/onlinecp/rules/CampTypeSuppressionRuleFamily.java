@@ -16,9 +16,9 @@ import com.vympelcom.biis.onlinecp.utils.DatabaseConnection;
 public class CampTypeSuppressionRuleFamily implements RuleFamily{
 
 	//Карта настроек правила
-	private volatile HashMap<String, CampTypeSuppressionRule> propertyList = null;
+	private volatile HashMap<String, CampTypeSuppressionRule> campTypeSuppressionMatrix = null;
 
-	private synchronized HashMap<String,CampTypeSuppressionRule> generateSuppresionMapping() throws Exception {
+	private HashMap<String,CampTypeSuppressionRule> generateSuppresionMapping() throws Exception {
 		HashMap<String,CampTypeSuppressionRule> result = new HashMap<String,CampTypeSuppressionRule>();
 		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
 		Connection connection=null;
@@ -50,14 +50,13 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 		return result;
 	}
 	
-	public CampTypeSuppressionRuleFamily getInstance() throws Exception{
-		if(propertyList==null){
-			synchronized (propertyList) {
-				if(propertyList==null)
-					propertyList = generateSuppresionMapping();				
+	public CampTypeSuppressionRuleFamily () throws Exception{
+		if(campTypeSuppressionMatrix==null){
+			synchronized (campTypeSuppressionMatrix) {
+				if(campTypeSuppressionMatrix==null)
+					campTypeSuppressionMatrix = generateSuppresionMapping();				
 			}
 		}
-		return this;
 	}
 
 	
@@ -68,7 +67,7 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 		try {
 			for(ContactHistoryRecord historyRecord: previousContacts)
 			{
-				CampTypeSuppressionRule targetRule = propertyList.get(historyRecord.toString()+String.valueOf(checkedCampaign.getCampaignType()));
+				CampTypeSuppressionRule targetRule = campTypeSuppressionMatrix.get(historyRecord.toString()+String.valueOf(checkedCampaign.getCampaignType()));
 				CPCheckResult currentResult = targetRule.applyRule(historyRecord.getContactDate(), currentDate);
 				if(!currentResult.isContactAllowed())
 				{

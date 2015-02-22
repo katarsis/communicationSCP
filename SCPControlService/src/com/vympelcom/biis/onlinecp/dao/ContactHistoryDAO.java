@@ -12,14 +12,13 @@ import com.vympelcom.biis.onlinecp.utils.DatabaseConnection;
 
 public class ContactHistoryDAO {
 
-	public List<ContactHistoryRecord> getHistoryByClientAndTimeRange(String ctn,
-		Date startDate, Date endDate) throws Exception {
+	public List<ContactHistoryRecord> getHistoryByClientAndTimeRange(String ctn,Date startDate, Date endDate) throws Exception {
 		List<ContactHistoryRecord> result = new ArrayList<ContactHistoryRecord>();
 		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();
-			CallableStatement callstmt = connection.prepareCall("select * from contact_history where ctn = ? and contact_date ? and ?");
+			CallableStatement callstmt = connection.prepareCall("select * from contact_history where ctn = ? and contact_date ? and ? order by contact_date desc");
 			callstmt.setString(1,ctn);
 			java.sql.Date startDateSql = new java.sql.Date(startDate.getTime());
 			java.sql.Date endDateSql = new java.sql.Date(endDate.getTime());

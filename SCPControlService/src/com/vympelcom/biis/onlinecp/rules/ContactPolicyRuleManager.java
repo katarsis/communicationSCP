@@ -11,11 +11,33 @@ public class ContactPolicyRuleManager {
 	/*TODO Нет.  На этом уровне уходит гибкость, работаем явно с тремя видами семейств правил*/
 	
 	/*В конструкторе: = new.... [3], и явно создать сами семьи, по конкретным именам классов*/
-	private RuleFamily ruleFamilyCampTypeSuppression;
-	private RuleFamily ruleFamilyMaxFrequency;
-	private RuleFamily ruleFamilyContactType;
+	private static RuleFamily ruleFamilyCampTypeSuppression;
+	private static RuleFamily ruleFamilyMaxFrequency;
+	private static RuleFamily ruleFamilyContactType;
+	private static boolean isInit =false;
 	
-		/*TODO: Implement*/
+	/*
+	 * конструктор закрытый для доступа 
+	 */
+	private ContactPolicyRuleManager(){
+		
+	}
+	
+	public ContactPolicyRuleManager getInstance() throws Exception{
+		if(!isInit){
+			synchronized (this) {
+				if(!isInit){
+					ruleFamilyCampTypeSuppression = new CampTypeSuppressionRuleFamily();
+					ruleFamilyContactType = new CampTypeSuppressionRuleFamily();
+					ruleFamilyMaxFrequency = new MaxFrequencyRuleFamily();
+					isInit = true;
+				}
+			}
+		}
+		return this;
+	}
+	
+	/*TODO: Implement*/
 	public int getMaxSuppressionInterval()
 	{
 		return -1;
@@ -26,6 +48,9 @@ public class ContactPolicyRuleManager {
 	{
 		
 	}
+	
+	
+	
 	public CPCheckResult checkContactPolicyAndStoreContact (String ctn, int campaignId, int channelId)
 	{
 		/*TODO

@@ -18,9 +18,6 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 
 	private volatile List<MaxFrequencyRule> maxFrequencyRuleList =  null;
 	
-	private MaxFrequencyRuleFamily() {
-	}
-	
 	private List<MaxFrequencyRule> generateMaxFrequencyRuleMap() throws Exception{
 		List<MaxFrequencyRule> result = new ArrayList<MaxFrequencyRule>();
 		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
@@ -45,14 +42,13 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 		return result;
 	}
 	
-	public MaxFrequencyRuleFamily getInstance() throws Exception{
+	public MaxFrequencyRuleFamily() throws Exception{
 		if(maxFrequencyRuleList == null){
 			synchronized (maxFrequencyRuleList) {
 				if(maxFrequencyRuleList == null)
 					maxFrequencyRuleList = generateMaxFrequencyRuleMap();
 			}
 		}
-		return this;
 	}
 	
 	
