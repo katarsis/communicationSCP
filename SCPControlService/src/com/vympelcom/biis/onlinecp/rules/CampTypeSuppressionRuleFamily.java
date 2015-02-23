@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
 import com.vympelcom.biis.onlinecp.domain.Campaign;
 import com.vympelcom.biis.onlinecp.domain.ContactHistoryRecord;
@@ -16,9 +18,11 @@ import com.vympelcom.biis.onlinecp.utils.DatabaseConnection;
 
 public class CampTypeSuppressionRuleFamily implements RuleFamily{
 
+	static final Logger log = Logger.getLogger(CampTypeSuppressionRuleFamily.class);
 	//Карта настроек правила
 	private volatile HashMap<String, CampTypeSuppressionRule> campTypeSuppressionMatrix = null;
-
+	
+	
 	private HashMap<String,CampTypeSuppressionRule> generateSuppresionMapping() throws Exception {
 		HashMap<String,CampTypeSuppressionRule> result = new HashMap<String,CampTypeSuppressionRule>();
 		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
@@ -52,12 +56,15 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 	}
 	
 	public CampTypeSuppressionRuleFamily () throws Exception{
-		if(campTypeSuppressionMatrix==null){
+		/*if(campTypeSuppressionMatrix==null){
 			synchronized (this) {
 				if(campTypeSuppressionMatrix==null)
 					campTypeSuppressionMatrix = generateSuppresionMapping();				
 			}
-		}
+		}*/
+		log.debug("Start initalization CampTypeSuppressionRuleFamily ");
+		campTypeSuppressionMatrix = generateSuppresionMapping();
+		log.debug("End initalization CampTypeSuppressionRuleFamily ");
 	}
 
 	

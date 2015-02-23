@@ -1,11 +1,6 @@
 package com.vympelcom.biis.onlinecp.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
@@ -55,8 +50,8 @@ public class SCPControlService {
 							 ) throws Exception{
 		int result =COMMUNICATION_APPROVED;
 		log.debug("Recive request with parameters: CTN:"+ctn+" camp_id:"+camp_id+" contact_type:"+contact_type);
-		ContactPolicyRuleManager ruleManager = ContactPolicyRuleManager.getInstance();
-		CPCheckResult resultApplyingRule = ruleManager.checkContactPolicyAndStoreContact(ctn, camp_id, contact_type);
+		ContactPolicyRuleManager contactPloicyRuleManager = ContactPolicyRuleManager.getInstance();
+		CPCheckResult resultApplyingRule = contactPloicyRuleManager.checkContactPolicyAndStoreContact(ctn, camp_id, contact_type);
 		if(!resultApplyingRule.isContactAllowed())
 			result = COMMUNICATION_ABORTED;
 		return result;

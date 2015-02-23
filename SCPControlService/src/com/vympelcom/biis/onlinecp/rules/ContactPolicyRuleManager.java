@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.vympelcom.biis.onlinecp.dao.CampaignsDAO;
 import com.vympelcom.biis.onlinecp.dao.ContactHistoryDAO;
 import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
@@ -23,13 +25,14 @@ public class ContactPolicyRuleManager {
 	private static RuleFamily ruleFamilyContactType;
 	private static boolean isInit =false;
 	private static List<RuleFamily> ruleFamilyList = new ArrayList<RuleFamily>();
-	private static ContactPolicyRuleManager ruleManager = null;
+	private static volatile ContactPolicyRuleManager ruleManager = null;
 	
+	static final Logger log = Logger.getLogger(ContactPolicyRuleManager.class);
 	/*
 	 * конструктор закрытый для доступа 
 	 */
 	private ContactPolicyRuleManager(){
-		
+		log.debug("initalization ContactPolicyRuleManager started");
 	}
 	
 	public static ContactPolicyRuleManager getInstance() throws Exception{
@@ -90,7 +93,7 @@ public class ContactPolicyRuleManager {
 			}
 			if(result.isContactAllowed())
 			{
-				ContactHistoryRecord newCommunicationSaved = new ContactHistoryRecord(ctn, currentDate, String.valueOf(checkedCampaign.getCampaignType()), "Online EPK", "", checkedCampaign.getId());
+				ContactHistoryRecord newCommunicationSaved = new ContactHistoryRecord(ctn, currentDate, String.valueOf(checkedCampaign.getCampaignType()), "Online EPK", "0", checkedCampaign.getId());
 				ContactHistoryDAO.writeRecordToContactHistory(newCommunicationSaved);
 			}
 		} catch (Exception e) {
