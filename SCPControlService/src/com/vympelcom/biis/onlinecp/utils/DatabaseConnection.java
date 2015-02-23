@@ -1,6 +1,7 @@
 package com.vympelcom.biis.onlinecp.utils;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -9,6 +10,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -43,7 +45,8 @@ public class DatabaseConnection {
         
         try{
         props = new Properties();
-        props.load(new InputStreamReader(new FileInputStream("/WEB_INF/datasource.properties"),"UTF-8"));
+        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("/resuorce/datasource.properties");
+        props.load(is);
         
         log.debug("ComboPooledDataSource");
         cpds = new ComboPooledDataSource();
@@ -63,7 +66,7 @@ public class DatabaseConnection {
         log.debug(cpds.getJdbcUrl());
        
         // test connectivity and initialize pool
-        
+        Locale.setDefault(Locale.ENGLISH);
            testConnection = cpds.getConnection();
            testStatement = testConnection.createStatement();
            testStatement.executeQuery("select 1+1 from DUAL");

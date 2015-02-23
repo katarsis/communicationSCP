@@ -3,6 +3,7 @@ package com.vympelcom.biis.onlinecp.dao;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,13 +13,13 @@ import com.vympelcom.biis.onlinecp.utils.DatabaseConnection;
 
 public class ContactHistoryDAO {
 
-	public List<ContactHistoryRecord> getHistoryByClientAndTimeRange(String ctn,Date startDate, Date endDate) throws Exception {
+	public static List<ContactHistoryRecord> getHistoryByClientAndTimeRange(String ctn,Date startDate, Date endDate) throws Exception {
 		List<ContactHistoryRecord> result = new ArrayList<ContactHistoryRecord>();
 		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();
-			CallableStatement callstmt = connection.prepareCall("select * from contact_history where ctn = ? and contact_date ? and ? order by contact_date desc");
+			CallableStatement callstmt = connection.prepareCall("select * from contact_history where ctn = ? and contact_date between ? and ? order by contact_date desc");
 			callstmt.setString(1,ctn);
 			java.sql.Date startDateSql = new java.sql.Date(startDate.getTime());
 			java.sql.Date endDateSql = new java.sql.Date(endDate.getTime());
@@ -28,7 +29,7 @@ public class ContactHistoryDAO {
 			
 			while (rs.next()) {
 				ContactHistoryRecord currentItem = new ContactHistoryRecord(rs.getString("ctn"),
-						rs.getString("contact_date"), rs.getString("contact_type"),rs.getString("contact_source"), "",rs.getInt("camp_id"));
+						rs.getDate("contact_date"), rs.getString("contact_type"),rs.getString("contact_source"), "",rs.getInt("camp_id"));
 				result.add(currentItem);
 			}
 		} catch (Exception e) {
@@ -37,6 +38,26 @@ public class ContactHistoryDAO {
 			connection.close();
 		}
 		return result;
+	}
+	
+	public static void writeRecordToContactHistory(ContactHistoryRecord savedRecord) throws Exception{
+		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
+		Connection connection=null;
+		try{
+			connection = databaseConnection.getConnection();
+			CallableStatement callstmt = connection.prepareCall("insert into contact_history (contact_id,ctn,contact_date,contact_type,contact_source,camp_id) values (contact_id_sequence.nextval,?,?,?,?,?)");
+			callstmt.setString("1", savedRecord.getCTN());
+			callstmt.setDate("2", new java.sql.Date(savedRecord.getContactDate().getTime()));
+			callstmt.setInt("3", savedRecord.getContactType());
+			callstmt.setString("4", "Online EPK");
+			callstmt.setInt("5", savedRecord.getCampaignId());
+			ResultSet rs = callstmt.executeQuery();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			connection.close();
+		}
 	}
 
 }

@@ -1,8 +1,15 @@
 package com.vympelcom.biis.onlinecp.rules;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
+import com.vympelcom.biis.onlinecp.dao.CampaignsDAO;
+import com.vympelcom.biis.onlinecp.dao.ContactHistoryDAO;
 import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
+import com.vympelcom.biis.onlinecp.domain.Campaign;
+import com.vympelcom.biis.onlinecp.domain.ContactHistoryRecord;
 
 /*TODO: нружен ли он?*/
 
@@ -15,6 +22,8 @@ public class ContactPolicyRuleManager {
 	private static RuleFamily ruleFamilyMaxFrequency;
 	private static RuleFamily ruleFamilyContactType;
 	private static boolean isInit =false;
+	private static List<RuleFamily> ruleFamilyList = new ArrayList<RuleFamily>();
+	private static ContactPolicyRuleManager ruleManager = null;
 	
 	/*
 	 * конструктор закрытый для доступа 
@@ -23,24 +32,33 @@ public class ContactPolicyRuleManager {
 		
 	}
 	
-	public ContactPolicyRuleManager getInstance() throws Exception{
-		if(!isInit){
-			synchronized (this) {
-				if(!isInit){
+	public static ContactPolicyRuleManager getInstance() throws Exception{
+		if(ruleManager==null){
+			synchronized (ContactPolicyRuleManager.class) {
+				if(ruleManager==null){
+					ruleManager = new ContactPolicyRuleManager();
 					ruleFamilyCampTypeSuppression = new CampTypeSuppressionRuleFamily();
+					ruleFamilyList.add(ruleFamilyCampTypeSuppression);
 					ruleFamilyContactType = new CampTypeSuppressionRuleFamily();
+					ruleFamilyList.add(ruleFamilyContactType);
 					ruleFamilyMaxFrequency = new MaxFrequencyRuleFamily();
-					isInit = true;
+					ruleFamilyList.add(ruleFamilyMaxFrequency);
+					isInit = true;	
 				}
 			}
 		}
-		return this;
+		return ruleManager;
 	}
 	
 	/*TODO: Implement*/
-	public int getMaxSuppressionInterval()
+	public long getMaxSuppressionInterval()
 	{
-		return -1;
+		long result =0;
+		for(RuleFamily ruleFamily: ruleFamilyList){
+			if(result<ruleFamily.getMaxDayInterval())
+				result = ruleFamily.getMaxDayInterval();
+		}
+		return result;
 	}
 	
 	/*TODO: Implement*/
@@ -53,6 +71,31 @@ public class ContactPolicyRuleManager {
 	
 	public CPCheckResult checkContactPolicyAndStoreContact (String ctn, int campaignId, int channelId)
 	{
+		Date currentDate =  new Date();
+		Calendar oldDateCalendar = Calendar.getInstance();
+		oldDateCalendar.setTime(currentDate);
+		oldDateCalendar.add(Calendar.DATE, -1*Long.valueOf(this.getMaxSuppressionInterval()).intValue());
+		Date oldDate = oldDateCalendar.getTime();
+		CPCheckResult result = new CPCheckResult(true);
+		try {
+			List<ContactHistoryRecord> previousContacts = ContactHistoryDAO.getHistoryByClientAndTimeRange(ctn, currentDate, oldDate);
+			Campaign checkedCampaign = CampaignsDAO.getCampaignById(campaignId);
+			for(RuleFamily selectedRule: ruleFamilyList){
+				CPCheckResult localResult = selectedRule.applyRuleFamily(ctn, checkedCampaign, previousContacts);
+				if(!localResult.isContactAllowed())
+				{
+					result = localResult;
+					break;
+				}
+			}
+			if(result.isContactAllowed())
+			{
+				ContactHistoryRecord newCommunicationSaved = new ContactHistoryRecord(ctn, currentDate, String.valueOf(checkedCampaign.getCampaignType()), "Online EPK", "", checkedCampaign.getId());
+				ContactHistoryDAO.writeRecordToContactHistory(newCommunicationSaved);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		/*TODO
 		 * 			* Определение интервала дат
 		 * 			* Наша блокировка по клиенту
@@ -62,6 +105,6 @@ public class ContactPolicyRuleManager {
 		 * 			* Запись его через DAO
 		 * 			* Снятие нашей блокировки
 		 * */
-		return null;
+		return result;
 	}
 }

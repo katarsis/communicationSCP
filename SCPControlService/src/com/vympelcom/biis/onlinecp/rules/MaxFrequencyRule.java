@@ -9,9 +9,9 @@ import com.vympelcom.biis.onlinecp.utils.GeneralUtils;
 
 public class MaxFrequencyRule {
 
-	int campType;
-	long countDayInPeriod;
-	int maxFrequency;
+	private int campType;
+	private long countDayInPeriod;
+	private int maxFrequency;
 	
 	public long getCountDayInPeriod() {
 		return countDayInPeriod;

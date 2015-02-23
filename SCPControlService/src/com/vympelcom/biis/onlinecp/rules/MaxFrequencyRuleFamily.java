@@ -44,7 +44,7 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 	
 	public MaxFrequencyRuleFamily() throws Exception{
 		if(maxFrequencyRuleList == null){
-			synchronized (maxFrequencyRuleList) {
+			synchronized (this) {
 				if(maxFrequencyRuleList == null)
 					maxFrequencyRuleList = generateMaxFrequencyRuleMap();
 			}
@@ -65,6 +65,16 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 				result.setContactAllowed(false);
 				break;
 			}
+		}
+		return result;
+	}
+
+	@Override
+	public long getMaxDayInterval() {
+		long result =0;
+		for(MaxFrequencyRule selectedRule :maxFrequencyRuleList){
+			if(selectedRule.getCountDayInPeriod()>result)
+				result = selectedRule.getCountDayInPeriod();
 		}
 		return result;
 	}

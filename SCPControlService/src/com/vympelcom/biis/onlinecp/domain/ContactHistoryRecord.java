@@ -51,9 +51,9 @@ public class ContactHistoryRecord {
 		this.id = id;
 	}
 	
-	public ContactHistoryRecord (String ctn, String date, String contactType, String contactSource, String id, int campId) throws ParseException{
+	public ContactHistoryRecord (String ctn, Date date, String contactType, String contactSource, String id, int campId) throws ParseException{
 		this.CTN = ctn;
-		this.contactDate = GeneralUtils.getDateFromString(date);
+		this.contactDate = date;
 		this.contactType = Integer.valueOf(contactType);
 		this.contactSource = contactSource;
 		this.id = Integer.valueOf(id);

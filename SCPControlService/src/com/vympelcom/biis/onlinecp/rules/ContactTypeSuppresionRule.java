@@ -8,11 +8,11 @@ import com.vympelcom.biis.onlinecp.utils.GeneralUtils;
 
 public class ContactTypeSuppresionRule {
 
-	int campType;
-	int communicationType;
-	int historyCampType;
-	long suppressionDay;
-	String baseDate;
+	private int campType;
+	private int communicationType;
+	private int historyCampType;
+	private long suppressionDay;
+	private String baseDate;
 	
 	public int getCommunicationType() {
 		return communicationType;

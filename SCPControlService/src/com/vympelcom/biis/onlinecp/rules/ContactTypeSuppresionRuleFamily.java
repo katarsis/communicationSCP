@@ -4,6 +4,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,7 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 
 	static final int VOICE_CONTACT_TYPE =1; 
 	
-	private static volatile HashMap<String,ContactTypeSuppresionRule> voiceChannelRuleMatrix = null;
+	private static volatile HashMap<String,ContactTypeSuppresionRule> contactTypeRuleMatrix = null;
 	
 	private HashMap<String,ContactTypeSuppresionRule> generateRuleMatrix() throws Exception{
 		HashMap<String, ContactTypeSuppresionRule> result = new HashMap<String, ContactTypeSuppresionRule>();
@@ -46,10 +47,10 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 	}
 	
 	public ContactTypeSuppresionRuleFamily() throws Exception{
-		if(voiceChannelRuleMatrix==null){
-			synchronized (voiceChannelRuleMatrix) {
-				if(voiceChannelRuleMatrix==null)
-					voiceChannelRuleMatrix = generateRuleMatrix();				
+		if(contactTypeRuleMatrix==null){
+			synchronized (contactTypeRuleMatrix) {
+				if(contactTypeRuleMatrix==null)
+					contactTypeRuleMatrix = generateRuleMatrix();				
 			}
 		}
 	}
@@ -63,7 +64,7 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 			{
 				Campaign lastCommunicationCampaign = CampaignsDAO.getCampaignById(previousContacts.get(0).getCampaignId());
 				String index = String.valueOf(lastCommunicationCampaign.getCampaignType())+String.valueOf(checkedCampaign.getCampaignType());
-				ContactTypeSuppresionRule selectedRule = voiceChannelRuleMatrix.get(index);
+				ContactTypeSuppresionRule selectedRule = contactTypeRuleMatrix.get(index);
 				result = selectedRule.applyRule(lastCommunicationCampaign,currentDate,previousContacts.get(0).getContactDate());
 			}
 		}catch (Exception e) {
@@ -77,6 +78,17 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 		boolean result = false;
 		if(historyRecord.getContactType()==VOICE_CONTACT_TYPE)
 			result = true;
+		return result;
+	}
+
+	@Override
+	public long getMaxDayInterval() {
+		long result = 0;
+		ArrayList<ContactTypeSuppresionRule> contactTypeRuleList = new ArrayList<ContactTypeSuppresionRule>(contactTypeRuleMatrix.values());
+		for(ContactTypeSuppresionRule selectedRule: contactTypeRuleList){
+			if(selectedRule.getSuppressionDay()>result)
+				result = selectedRule.getSuppressionDay();
+		}
 		return result;
 	}
 

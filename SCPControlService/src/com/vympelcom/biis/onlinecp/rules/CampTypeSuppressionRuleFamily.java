@@ -4,6 +4,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +53,7 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 	
 	public CampTypeSuppressionRuleFamily () throws Exception{
 		if(campTypeSuppressionMatrix==null){
-			synchronized (campTypeSuppressionMatrix) {
+			synchronized (this) {
 				if(campTypeSuppressionMatrix==null)
 					campTypeSuppressionMatrix = generateSuppresionMapping();				
 			}
@@ -77,6 +78,17 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		return result;
+	}
+
+	@Override
+	public long getMaxDayInterval() {
+		long result =0;
+		ArrayList<CampTypeSuppressionRule> campTypeSuppressionRule =new ArrayList<CampTypeSuppressionRule>(campTypeSuppressionMatrix.values());
+		for(CampTypeSuppressionRule selectedRule: campTypeSuppressionRule){
+			if(selectedRule.getCountOfSuppresionDay()>result)
+				result = selectedRule.getCountOfSuppresionDay();
 		}
 		return result;
 	}

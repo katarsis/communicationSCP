@@ -19,6 +19,9 @@ import javax.xml.ws.WebServiceContext;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
+import com.vympelcom.biis.onlinecp.rules.ContactPolicyRuleManager;
+
 
 
 @WebService
@@ -50,8 +53,12 @@ public class SCPControlService {
 							  @WebParam(name="camp_id")int camp_id,
 							  @WebParam(name="contact_type")int contact_type 
 							 ) throws Exception{
+		int result =COMMUNICATION_APPROVED;
 		log.debug("Recive request with parameters: CTN:"+ctn+" camp_id:"+camp_id+" contact_type:"+contact_type);
-		int result = COMMUNICATION_APPROVED;
+		ContactPolicyRuleManager ruleManager = ContactPolicyRuleManager.getInstance();
+		CPCheckResult resultApplyingRule = ruleManager.checkContactPolicyAndStoreContact(ctn, camp_id, contact_type);
+		if(!resultApplyingRule.isContactAllowed())
+			result = COMMUNICATION_ABORTED;
 		return result;
 	}
 }

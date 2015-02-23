@@ -8,9 +8,9 @@ import com.vympelcom.biis.onlinecp.utils.GeneralUtils;
 public class CampTypeSuppressionRule {
 
 
-	String histCampaign;
-	String checkedCampaign;
-	Long countOfSuppresionDay;
+	private String histCampaign;
+	private String checkedCampaign;
+	private Long countOfSuppresionDay;
 	
 	public String getHistCampaign() {
 		return histCampaign;
