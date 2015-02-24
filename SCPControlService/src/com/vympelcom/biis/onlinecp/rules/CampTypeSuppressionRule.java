@@ -41,11 +41,18 @@ public class CampTypeSuppressionRule {
 	{
 		CPCheckResult result = new CPCheckResult(true);
 		long factPeriodIndays = GeneralUtils.getDateDifferenceInDay(historyDate, currentDate);
-		if(countOfSuppresionDay<=factPeriodIndays)
+		if(countOfSuppresionDay>=factPeriodIndays)
 		{
 			result = new CPCheckResult(false);
 		}
 		return result;
+	}
+	
+	@Override
+	public String toString() {
+		return "CampTypeSuppressionRule [histCampaign=" + histCampaign
+				+ ", checkedCampaign=" + checkedCampaign
+				+ ", countOfSuppresionDay=" + countOfSuppresionDay + "]";
 	}
 
 	

@@ -39,6 +39,7 @@ public class SCPControlService {
 			e.printStackTrace();
 		} 
         PropertyConfigurator.configure(props);
+        
         log = Logger.getLogger(SCPControlService.class);
 	}
 	
@@ -49,11 +50,12 @@ public class SCPControlService {
 							  @WebParam(name="contact_type")int contact_type 
 							 ) throws Exception{
 		int result =COMMUNICATION_APPROVED;
-		log.debug("Recive request with parameters: CTN:"+ctn+" camp_id:"+camp_id+" contact_type:"+contact_type);
+		log.info("Recive request with parameters: CTN:"+ctn+" camp_id:"+camp_id+" contact_type:"+contact_type);
 		ContactPolicyRuleManager contactPloicyRuleManager = ContactPolicyRuleManager.getInstance();
 		CPCheckResult resultApplyingRule = contactPloicyRuleManager.checkContactPolicyAndStoreContact(ctn, camp_id, contact_type);
 		if(!resultApplyingRule.isContactAllowed())
 			result = COMMUNICATION_ABORTED;
+		log.info("Request with parameters: CTN:"+ctn+" camp_id:"+camp_id+" contact_type:"+contact_type+" is handled, result:"+result);
 		return result;
 	}
 }

@@ -3,8 +3,6 @@ package com.vympelcom.biis.onlinecp.domain;
 import java.text.ParseException;
 import java.util.Date;
 
-import com.vympelcom.biis.onlinecp.utils.GeneralUtils;
-
 public class ContactHistoryRecord {
 
 	String CTN;
@@ -13,6 +11,7 @@ public class ContactHistoryRecord {
 	String contactSource;
 	int id;
 	int campaignId;
+	int campaignType;
 	
 	public int getCampaignId() {
 		return campaignId;
@@ -51,13 +50,21 @@ public class ContactHistoryRecord {
 		this.id = id;
 	}
 	
-	public ContactHistoryRecord (String ctn, Date date, String contactType, String contactSource, String id, int campId) throws ParseException{
+	public int getCampaignType() {
+		return campaignType;
+	}
+	public void setCampaignType(int campaignType) {
+		this.campaignType = campaignType;
+	}
+	
+	public ContactHistoryRecord (String ctn, Date date, String contactType, String contactSource, String id, int campId, int campaignType) throws ParseException{
 		this.CTN = ctn;
 		this.contactDate = date;
 		this.contactType = Integer.valueOf(contactType);
 		this.contactSource = contactSource;
 		this.id = Integer.valueOf(id);
 		this.campaignId = campId;
+		this.campaignType = campaignType;
 	}
 	
 }

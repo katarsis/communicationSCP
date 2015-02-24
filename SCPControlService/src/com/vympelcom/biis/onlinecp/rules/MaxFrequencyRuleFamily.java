@@ -3,10 +3,11 @@ package com.vympelcom.biis.onlinecp.rules;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 
 import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
 import com.vympelcom.biis.onlinecp.domain.Campaign;
@@ -17,6 +18,8 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 {
 
 	private volatile List<MaxFrequencyRule> maxFrequencyRuleList =  null;
+	
+	static final Logger log = Logger.getLogger(MaxFrequencyRuleFamily.class);
 	
 	private List<MaxFrequencyRule> generateMaxFrequencyRuleMap() throws Exception{
 		List<MaxFrequencyRule> result = new ArrayList<MaxFrequencyRule>();
@@ -30,12 +33,11 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 			while (rs.next()) {
 				MaxFrequencyRule  currentItem = new MaxFrequencyRule(rs.getInt("CAMPAIGN_TYPE"), rs.getLong("ANALYSIS_PERIOD"), rs.getInt("MAX_CONTACT_FREQUENCY"));  
 				result.add(currentItem);
+				log.info("Load MaxFrequencyRule: "+ currentItem.toString());
 			}
-		}catch(SQLException exp)
+		}catch(Exception exp)
 		{
-			exp.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+			log.fatal("Could not load MaxFrequencyRuleFamily: " + exp.getMessage());
 		}finally{
 			connection.close();
 		}
@@ -43,19 +45,15 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 	}
 	
 	public MaxFrequencyRuleFamily() throws Exception{
-		if(maxFrequencyRuleList == null){
-			synchronized (this) {
-				if(maxFrequencyRuleList == null)
-					maxFrequencyRuleList = generateMaxFrequencyRuleMap();
-			}
-		}
+		log.debug("Start initalization of MaxFrequencyRuleFamily");
+		maxFrequencyRuleList = generateMaxFrequencyRuleMap();
+		log.debug("Initalization of MaxFrequencyRuleFamily is ended");
 	}
 	
 	
 	
 	@Override
-	public CPCheckResult applyRuleFamily(String ctn, Campaign checkedCampaign,
-			List<ContactHistoryRecord> previousContacts) {
+	public CPCheckResult applyRuleFamily(String ctn, Campaign checkedCampaign,List<ContactHistoryRecord> previousContacts){
 		CPCheckResult result = new CPCheckResult(true);
 		Date currentDate =  new Date();
 		for(MaxFrequencyRule currentRule : maxFrequencyRuleList)

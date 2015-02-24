@@ -3,11 +3,12 @@ package com.vympelcom.biis.onlinecp.rules;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 
 import com.vympelcom.biis.onlinecp.dao.CampaignsDAO;
 import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
@@ -18,6 +19,8 @@ import com.vympelcom.biis.onlinecp.utils.DatabaseConnection;
 public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 
 	static final int VOICE_CONTACT_TYPE =1; 
+	
+	static final Logger log = Logger.getLogger(ContactTypeSuppresionRuleFamily.class);
 	
 	private static volatile HashMap<String,ContactTypeSuppresionRule> contactTypeRuleMatrix = null;
 	
@@ -34,12 +37,10 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 				ContactTypeSuppresionRule  currentItem = new ContactTypeSuppresionRule(rs.getInt("CHECK_CAMPAIGN_TYPE"), rs.getInt("HISTORY_CAMPAIGN_TYPE"), rs.getLong("SUPPRESSION_INTERVAL_DAYS"), rs.getString("SUPPRESION_BASE_DATE"), rs.getInt("CONTACT_TYPE"));  
 				String matrixKey = String.valueOf(currentItem.getCampType())+ String.valueOf(currentItem.getHistoryCampType());
 				result.put(matrixKey,currentItem);
+				log.info("Load ContactTypeSuppresionRule "+currentItem.toString());
 			}
-		}catch(SQLException exp)
-		{
-			exp.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+		}catch (Exception e) {
+			log.fatal("Could not load ContactTypeSuppresionRuleFamily:" + e.getMessage());
 		}finally{
 			connection.close();
 		}
@@ -47,12 +48,9 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 	}
 	
 	public ContactTypeSuppresionRuleFamily() throws Exception{
-		if(contactTypeRuleMatrix==null){
-			synchronized (contactTypeRuleMatrix) {
-				if(contactTypeRuleMatrix==null)
-					contactTypeRuleMatrix = generateRuleMatrix();				
-			}
-		}
+		log.debug("Start initalization of ContactTypeSuppresionRuleFamily ");
+		contactTypeRuleMatrix = generateRuleMatrix();				
+		log.debug("Initalization of ContactTypeSuppresionRuleFamily ended");
 	}
 	
 	@Override
@@ -60,7 +58,7 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 		CPCheckResult result = new CPCheckResult(true);
 		Date currentDate =  new Date();
 		try {
-			if(lastCommunicationIsVoice(previousContacts.get(0)))
+			if(!previousContacts.isEmpty()&&lastCommunicationIsVoice(previousContacts.get(0)))
 			{
 				Campaign lastCommunicationCampaign = CampaignsDAO.getCampaignById(previousContacts.get(0).getCampaignId());
 				String index = String.valueOf(lastCommunicationCampaign.getCampaignType())+String.valueOf(checkedCampaign.getCampaignType());

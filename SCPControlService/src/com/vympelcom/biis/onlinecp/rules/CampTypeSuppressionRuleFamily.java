@@ -3,7 +3,6 @@ package com.vympelcom.biis.onlinecp.rules;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +35,7 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 				CampTypeSuppressionRule  currentItem = new CampTypeSuppressionRule(rs.getString("history_campaign_type"),rs.getString("check_campaign_type"),
 						rs.getLong("SUPPRESSION_INTERVAL_DAYS"));  
 				result.put(currentItem.getHistCampaign()+currentItem.getCheckedCampaign(),currentItem);
+				log.info("Load CampTypeSuppressionRule: " + currentItem.toString());
 			}
 			
 			/*TODO: 
@@ -44,11 +44,11 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 			 		2) Прервать инициализацию сервиса. Мы не должны начинать слушать веб сервис.
 			 */
 						
-		}catch(SQLException exp)
+		}catch(Exception exp)
 		{
-			exp.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+			log.fatal("Could not load CampTypeSuppressionRuleFamily property list :"+ exp.getMessage());
+			//прерывание инициализации сервиса
+			System.exit(0);
 		}finally{
 			connection.close();
 		}
@@ -56,12 +56,6 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 	}
 	
 	public CampTypeSuppressionRuleFamily () throws Exception{
-		/*if(campTypeSuppressionMatrix==null){
-			synchronized (this) {
-				if(campTypeSuppressionMatrix==null)
-					campTypeSuppressionMatrix = generateSuppresionMapping();				
-			}
-		}*/
 		log.debug("Start initalization CampTypeSuppressionRuleFamily ");
 		campTypeSuppressionMatrix = generateSuppresionMapping();
 		log.debug("End initalization CampTypeSuppressionRuleFamily ");
@@ -75,7 +69,7 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 		try {
 			for(ContactHistoryRecord historyRecord: previousContacts)
 			{
-				CampTypeSuppressionRule targetRule = campTypeSuppressionMatrix.get(historyRecord.toString()+String.valueOf(checkedCampaign.getCampaignType()));
+				CampTypeSuppressionRule targetRule = campTypeSuppressionMatrix.get(String.valueOf(historyRecord.getCampaignType())+String.valueOf(checkedCampaign.getCampaignType()));
 				CPCheckResult currentResult = targetRule.applyRule(historyRecord.getContactDate(), currentDate);
 				if(!currentResult.isContactAllowed())
 				{

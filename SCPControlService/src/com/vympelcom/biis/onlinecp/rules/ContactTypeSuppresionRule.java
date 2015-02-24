@@ -46,14 +46,6 @@ public class ContactTypeSuppresionRule {
 		this.baseDate = baseDate;
 	} 
 	
-	/**
-	 * 
-	 * @param campType
-	 * @param historyCampType
-	 * @param suppressionDay
-	 * @param baseDate
-	 * @param communicationType
-	 */
 	public ContactTypeSuppresionRule(int campType, int historyCampType, long suppressionDay, String baseDate, int communicationType){
 		this.campType = campType;
 		this.historyCampType = historyCampType;
@@ -64,9 +56,21 @@ public class ContactTypeSuppresionRule {
 	
 	public CPCheckResult applyRule(Campaign lastCompany,Date currentDate, Date lastContactDate){
 		CPCheckResult result = new CPCheckResult(true);
-		if(GeneralUtils.getDateDifferenceInDay(lastContactDate, currentDate)<this.suppressionDay)
-			result = new CPCheckResult(false);
+		if(baseDate.equals("offer_date"))
+			if(GeneralUtils.getDateDifferenceInDay(lastCompany.getOfferDate(), currentDate)<this.suppressionDay)
+				result = new CPCheckResult(false);
+		else if(baseDate.equals("inform_date"))
+			if(GeneralUtils.getDateDifferenceInDay(lastCompany.getInformDate(), currentDate)<this.suppressionDay)
+				result = new CPCheckResult(false);
 		return result;
+	}
+	
+	@Override
+	public String toString() {
+		return "ContactTypeSuppresionRule [campType=" + campType
+				+ ", communicationType=" + communicationType
+				+ ", historyCampType=" + historyCampType + ", suppressionDay="
+				+ suppressionDay + ", baseDate=" + baseDate + "]";
 	}
 	
 }

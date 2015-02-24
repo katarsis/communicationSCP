@@ -12,6 +12,8 @@ import com.vympelcom.biis.onlinecp.dao.ContactHistoryDAO;
 import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
 import com.vympelcom.biis.onlinecp.domain.Campaign;
 import com.vympelcom.biis.onlinecp.domain.ContactHistoryRecord;
+import com.vympelcom.biis.onlinecp.utils.ClientLockDescriptor;
+import com.vympelcom.biis.onlinecp.utils.ClientLockManager;
 
 /*TODO: нружен ли он?*/
 
@@ -23,7 +25,7 @@ public class ContactPolicyRuleManager {
 	private static RuleFamily ruleFamilyCampTypeSuppression;
 	private static RuleFamily ruleFamilyMaxFrequency;
 	private static RuleFamily ruleFamilyContactType;
-	private static boolean isInit =false;
+	
 	private static List<RuleFamily> ruleFamilyList = new ArrayList<RuleFamily>();
 	private static volatile ContactPolicyRuleManager ruleManager = null;
 	
@@ -42,11 +44,11 @@ public class ContactPolicyRuleManager {
 					ruleManager = new ContactPolicyRuleManager();
 					ruleFamilyCampTypeSuppression = new CampTypeSuppressionRuleFamily();
 					ruleFamilyList.add(ruleFamilyCampTypeSuppression);
-					ruleFamilyContactType = new CampTypeSuppressionRuleFamily();
+					ruleFamilyContactType = new ContactTypeSuppresionRuleFamily();
 					ruleFamilyList.add(ruleFamilyContactType);
 					ruleFamilyMaxFrequency = new MaxFrequencyRuleFamily();
 					ruleFamilyList.add(ruleFamilyMaxFrequency);
-					isInit = true;	
+						
 				}
 			}
 		}
@@ -54,7 +56,7 @@ public class ContactPolicyRuleManager {
 	}
 	
 	/*TODO: Implement*/
-	public long getMaxSuppressionInterval()
+	private long getMaxSuppressionInterval()
 	{
 		long result =0;
 		for(RuleFamily ruleFamily: ruleFamilyList){
@@ -63,6 +65,16 @@ public class ContactPolicyRuleManager {
 		}
 		return result;
 	}
+	
+	
+	private Date getOldCommunicationDate(){
+		Date currentDate =  new Date();
+		Calendar oldDateCalendar = Calendar.getInstance();
+		oldDateCalendar.setTime(currentDate);
+		oldDateCalendar.add(Calendar.DATE, -1*Long.valueOf(this.getMaxSuppressionInterval()).intValue());
+		return oldDateCalendar.getTime();
+	}
+	
 	
 	/*TODO: Implement*/
 	public void initialize()
@@ -75,13 +87,11 @@ public class ContactPolicyRuleManager {
 	public CPCheckResult checkContactPolicyAndStoreContact (String ctn, int campaignId, int channelId)
 	{
 		Date currentDate =  new Date();
-		Calendar oldDateCalendar = Calendar.getInstance();
-		oldDateCalendar.setTime(currentDate);
-		oldDateCalendar.add(Calendar.DATE, -1*Long.valueOf(this.getMaxSuppressionInterval()).intValue());
-		Date oldDate = oldDateCalendar.getTime();
 		CPCheckResult result = new CPCheckResult(true);
+		ClientLockDescriptor clientLockDescriptor = null;
 		try {
-			List<ContactHistoryRecord> previousContacts = ContactHistoryDAO.getHistoryByClientAndTimeRange(ctn, currentDate, oldDate);
+			clientLockDescriptor = ClientLockManager.GetClientLock(ctn);
+			List<ContactHistoryRecord> previousContacts = ContactHistoryDAO.getHistoryByClient(ctn);
 			Campaign checkedCampaign = CampaignsDAO.getCampaignById(campaignId);
 			for(RuleFamily selectedRule: ruleFamilyList){
 				CPCheckResult localResult = selectedRule.applyRuleFamily(ctn, checkedCampaign, previousContacts);
@@ -91,13 +101,15 @@ public class ContactPolicyRuleManager {
 					break;
 				}
 			}
-			if(result.isContactAllowed())
+			if(result.isContactAllowed()&&checkedCampaign!=null)
 			{
-				ContactHistoryRecord newCommunicationSaved = new ContactHistoryRecord(ctn, currentDate, String.valueOf(checkedCampaign.getCampaignType()), "Online EPK", "0", checkedCampaign.getId());
+				ContactHistoryRecord newCommunicationSaved = new ContactHistoryRecord(ctn, currentDate, String.valueOf(checkedCampaign.getCampaignType()), "Online EPK", "0", checkedCampaign.getId(),0);
 				ContactHistoryDAO.writeRecordToContactHistory(newCommunicationSaved);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Request with parameters: CTN:"+ctn+" camp_id:"+campaignId+" contact_type:"+channelId+" is aborted: "+e.getMessage());
+		}finally{
+			ClientLockManager.RemoveClientLock(clientLockDescriptor);
 		}
 		/*TODO
 		 * 			* Определение интервала дат

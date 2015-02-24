@@ -44,10 +44,10 @@ public class MaxFrequencyRule {
 	public CPCheckResult applyRule(List<ContactHistoryRecord> previsiosCommunication, Date currentDate){
 		CPCheckResult result = new CPCheckResult(true);
 		int localMaxFrequecy = maxFrequency;
+		
 		for(ContactHistoryRecord historyRecord: previsiosCommunication){
-			if(historyRecord.getContactType() == campType){
-				if(GeneralUtils.getDateDifferenceInDay(historyRecord.getContactDate(), currentDate)<countDayInPeriod)
-				{
+			if(Long.compare(GeneralUtils.getDateDifferenceInDay(historyRecord.getContactDate(), currentDate),countDayInPeriod)<=0)
+			{
 					if(localMaxFrequecy>0)
 						maxFrequency --;
 					else
@@ -55,9 +55,13 @@ public class MaxFrequencyRule {
 						result = new CPCheckResult(false);
 						break;
 					}
-				}
 			}
 		}
 		return result;
+	}
+	@Override
+	public String toString() {
+		return "MaxFrequencyRule [campType=" + campType + ", countDayInPeriod="
+				+ countDayInPeriod + ", maxFrequency=" + maxFrequency + "]";
 	}
 }
