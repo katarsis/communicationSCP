@@ -29,25 +29,16 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 		try{
 			connection = databaseConnection.getConnection();
 			CallableStatement callstmt = connection.prepareCall("select * from CP_RULE_1_GENERAL_SUPPR_MATRIX ");
-			ResultSet rs = callstmt.executeQuery();
+			ResultSet queryResult = callstmt.executeQuery();
 			
-			while (rs.next()) {
-				CampTypeSuppressionRule  currentItem = new CampTypeSuppressionRule(rs.getString("history_campaign_type"),rs.getString("check_campaign_type"),
-						rs.getLong("SUPPRESSION_INTERVAL_DAYS"));  
+			while (queryResult.next()) {
+				CampTypeSuppressionRule  currentItem = new CampTypeSuppressionRule(queryResult.getString("history_campaign_type"),queryResult.getString("check_campaign_type"),
+						queryResult.getLong("SUPPRESSION_INTERVAL_DAYS"));  
 				result.put(currentItem.getHistCampaign()+currentItem.getCheckedCampaign(),currentItem);
-				log.info("Load CampTypeSuppressionRule: " + currentItem.toString());
+				log.info("Загружено правило CampTypeSuppressionRule: " + currentItem.toString());
 			}
-			
-			/*TODO: 
-			 		1) Вывести в лог явно что не удалось загрузить список правил такого-то семейства.
-			 			(log4j, FATAL)
-			 		2) Прервать инициализацию сервиса. Мы не должны начинать слушать веб сервис.
-			 */
-						
-		}catch(Exception exp)
-		{
-			log.fatal("Could not load CampTypeSuppressionRuleFamily property list :"+ exp.getMessage());
-			//прерывание инициализации сервиса
+		}catch(Exception exp){
+			log.fatal("Ошибка при загрузке правил политики коммуникаци :"+ exp.getMessage());
 			System.exit(0);
 		}finally{
 			connection.close();
@@ -56,14 +47,14 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 	}
 	
 	public CampTypeSuppressionRuleFamily () throws Exception{
-		log.debug("Start initalization CampTypeSuppressionRuleFamily ");
+		log.debug("Запуск инициализации семейства правил CampTypeSuppressionRuleFamily");
 		campTypeSuppressionMatrix = generateSuppresionMapping();
-		log.debug("End initalization CampTypeSuppressionRuleFamily ");
+		log.debug("Окончание инициализации семейства правил CampTypeSuppressionRuleFamily ");
 	}
 
 	
 	@Override
-	public CPCheckResult applyRuleFamily(String ctn, Campaign checkedCampaign,List<ContactHistoryRecord> previousContacts) {
+	public CPCheckResult applyRuleFamily(String ctn, Campaign checkedCampaign,List<ContactHistoryRecord> previousContacts) throws Exception{
 		CPCheckResult result =  new CPCheckResult(true);
 		Date currentDate = new Date();
 		try {
@@ -78,24 +69,12 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Ошибка применения семейства правил коммуникации:CampTypeSuppressionRuleFamily "+e.getMessage());
+			throw e;
 		}
 		return result;
 	}
 
-	@Override
-	public long getMaxDayInterval() {
-		long result =0;
-		ArrayList<CampTypeSuppressionRule> campTypeSuppressionRule =new ArrayList<CampTypeSuppressionRule>(campTypeSuppressionMatrix.values());
-		for(CampTypeSuppressionRule selectedRule: campTypeSuppressionRule){
-			if(selectedRule.getCountOfSuppresionDay()>result)
-				result = selectedRule.getCountOfSuppresionDay();
-		}
-		return result;
-	}
-	
-	
-	
-	
+
 
 }

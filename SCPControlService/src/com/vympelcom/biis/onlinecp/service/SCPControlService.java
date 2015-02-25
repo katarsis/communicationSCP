@@ -21,8 +21,6 @@ import com.vympelcom.biis.onlinecp.rules.ContactPolicyRuleManager;
 
 @WebService
 public class SCPControlService {
-	static final int COMMUNICATION_APPROVED =1;
-	static final int COMMUNICATION_ABORTED =0;
 	
 	static Logger log ;
 	
@@ -45,17 +43,12 @@ public class SCPControlService {
 	
 	@WebMethod
 	@WebResult(name="return")
-	public int communicateSCP(@WebParam(name="ctn")String ctn,
-							  @WebParam(name="camp_id")int camp_id,
-							  @WebParam(name="contact_type")int contact_type 
-							 ) throws Exception{
-		int result =COMMUNICATION_APPROVED;
-		log.info("Recive request with parameters: CTN:"+ctn+" camp_id:"+camp_id+" contact_type:"+contact_type);
+	public int communicateSCP(@WebParam(name="ctn")String ctn,@WebParam(name="camp_id")int camp_id, @WebParam(name="contact_type")int contact_type) throws Exception{
+		log.debug("Получен запрос с параметрами CTN:"+ctn+" camp_id:"+camp_id+" contact_type:"+contact_type);
+		CPCheckResult resultApplyingRule = new CPCheckResult(true);
 		ContactPolicyRuleManager contactPloicyRuleManager = ContactPolicyRuleManager.getInstance();
-		CPCheckResult resultApplyingRule = contactPloicyRuleManager.checkContactPolicyAndStoreContact(ctn, camp_id, contact_type);
-		if(!resultApplyingRule.isContactAllowed())
-			result = COMMUNICATION_ABORTED;
-		log.info("Request with parameters: CTN:"+ctn+" camp_id:"+camp_id+" contact_type:"+contact_type+" is handled, result:"+result);
-		return result;
+		resultApplyingRule = contactPloicyRuleManager.checkContactPolicyAndStoreContact(ctn, camp_id, contact_type);
+		log.info("Запрос с параметрами CTN:"+ctn+" camp_id:"+camp_id+" contact_type:"+contact_type+" обработан, результат запроса:"+resultApplyingRule.isContactAllowedInt());
+		return resultApplyingRule.isContactAllowedInt();
 	}
 }

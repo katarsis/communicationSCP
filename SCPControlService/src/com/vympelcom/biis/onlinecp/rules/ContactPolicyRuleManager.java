@@ -30,14 +30,12 @@ public class ContactPolicyRuleManager {
 	private static volatile ContactPolicyRuleManager ruleManager = null;
 	
 	static final Logger log = Logger.getLogger(ContactPolicyRuleManager.class);
-	/*
-	 * конструктор закрытый для доступа 
-	 */
+
 	private ContactPolicyRuleManager(){
-		log.debug("initalization ContactPolicyRuleManager started");
 	}
 	
 	public static ContactPolicyRuleManager getInstance() throws Exception{
+		log.info("Запуск инициализации правил контатконой политики");
 		if(ruleManager==null){
 			synchronized (ContactPolicyRuleManager.class) {
 				if(ruleManager==null){
@@ -52,74 +50,38 @@ public class ContactPolicyRuleManager {
 				}
 			}
 		}
+		log.info("Инициализация правил контактной политики завершена");
 		return ruleManager;
 	}
 	
-	/*TODO: Implement*/
-	private long getMaxSuppressionInterval()
-	{
-		long result =0;
-		for(RuleFamily ruleFamily: ruleFamilyList){
-			if(result<ruleFamily.getMaxDayInterval())
-				result = ruleFamily.getMaxDayInterval();
-		}
-		return result;
-	}
 	
-	
-	private Date getOldCommunicationDate(){
-		Date currentDate =  new Date();
-		Calendar oldDateCalendar = Calendar.getInstance();
-		oldDateCalendar.setTime(currentDate);
-		oldDateCalendar.add(Calendar.DATE, -1*Long.valueOf(this.getMaxSuppressionInterval()).intValue());
-		return oldDateCalendar.getTime();
-	}
-	
-	
-	/*TODO: Implement*/
-	public void initialize()
-	{
-		
-	}
-	
-	
-	
-	public CPCheckResult checkContactPolicyAndStoreContact (String ctn, int campaignId, int channelId)
+	public CPCheckResult checkContactPolicyAndStoreContact (String ctn, int campaignId, int communicationType)
 	{
 		Date currentDate =  new Date();
-		CPCheckResult result = new CPCheckResult(true);
+		CPCheckResult resultApplyingAllRuleFamily = new CPCheckResult(true);
 		ClientLockDescriptor clientLockDescriptor = null;
 		try {
 			clientLockDescriptor = ClientLockManager.GetClientLock(ctn);
 			List<ContactHistoryRecord> previousContacts = ContactHistoryDAO.getHistoryByClient(ctn);
 			Campaign checkedCampaign = CampaignsDAO.getCampaignById(campaignId);
 			for(RuleFamily selectedRule: ruleFamilyList){
-				CPCheckResult localResult = selectedRule.applyRuleFamily(ctn, checkedCampaign, previousContacts);
-				if(!localResult.isContactAllowed())
+				CPCheckResult resultApplyingRuleFamily = selectedRule.applyRuleFamily(ctn, checkedCampaign, previousContacts);
+				if(!resultApplyingRuleFamily.isContactAllowed())
 				{
-					result = localResult;
+					resultApplyingAllRuleFamily = resultApplyingRuleFamily;
 					break;
 				}
 			}
-			if(result.isContactAllowed()&&checkedCampaign!=null)
+			if(resultApplyingAllRuleFamily.isContactAllowed()&&checkedCampaign!=null)
 			{
-				ContactHistoryRecord newCommunicationSaved = new ContactHistoryRecord(ctn, currentDate, String.valueOf(checkedCampaign.getCampaignType()), "Online EPK", "0", checkedCampaign.getId(),0);
-				ContactHistoryDAO.writeRecordToContactHistory(newCommunicationSaved);
+				ContactHistoryRecord newCommunicationRecord = new ContactHistoryRecord(ctn, currentDate, String.valueOf(communicationType), "Online EPK", "0", checkedCampaign.getId(),0);
+				ContactHistoryDAO.writeRecordToContactHistory(newCommunicationRecord);
 			}
 		} catch (Exception e) {
-			log.error("Request with parameters: CTN:"+ctn+" camp_id:"+campaignId+" contact_type:"+channelId+" is aborted: "+e.getMessage());
+			log.error("Request with parameters: CTN:"+ctn+" camp_id:"+campaignId+" contact_type:"+communicationType+" is aborted: "+e.getMessage());
 		}finally{
 			ClientLockManager.RemoveClientLock(clientLockDescriptor);
 		}
-		/*TODO
-		 * 			* Определение интервала дат
-		 * 			* Наша блокировка по клиенту
-		 * 			* Подтягивание массива контактов
-		 * 			* Применение трех правил по очереди
-		 * 			* Создание нового контакта (как объекта ContactHistoryRecord !
-		 * 			* Запись его через DAO
-		 * 			* Снятие нашей блокировки
-		 * */
-		return result;
+		return resultApplyingAllRuleFamily;
 	}
 }

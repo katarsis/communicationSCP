@@ -31,7 +31,7 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 			ResultSet rs = callstmt.executeQuery();
 			
 			while (rs.next()) {
-				MaxFrequencyRule  currentItem = new MaxFrequencyRule(rs.getInt("CAMPAIGN_TYPE"), rs.getLong("ANALYSIS_PERIOD"), rs.getInt("MAX_CONTACT_FREQUENCY"));  
+				MaxFrequencyRule  currentItem = new MaxFrequencyRule(rs.getLong("ANALYSIS_PERIOD"), rs.getInt("MAX_CONTACT_FREQUENCY"));  
 				result.add(currentItem);
 				log.info("Load MaxFrequencyRule: "+ currentItem.toString());
 			}
@@ -67,19 +67,5 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 		return result;
 	}
 
-	@Override
-	public long getMaxDayInterval() {
-		long result =0;
-		for(MaxFrequencyRule selectedRule :maxFrequencyRuleList){
-			if(selectedRule.getCountDayInPeriod()>result)
-				result = selectedRule.getCountDayInPeriod();
-		}
-		return result;
-	}
-	
-	/*TODO хранит массив Rules; Содержит метод для инициализации из БД. 
-	 * 	Вызывается не из конструктора, а явно (.initialize)*/
-
-	
-
+		
 }

@@ -6,8 +6,7 @@ import com.vympelcom.biis.onlinecp.domain.*;
 
 public interface RuleFamily {
 
-	public CPCheckResult applyRuleFamily (String ctn, Campaign checkedCampaign, List<ContactHistoryRecord> previousContacts);
+	public CPCheckResult applyRuleFamily (String ctn, Campaign checkedCampaign, List<ContactHistoryRecord> previousContacts) throws Exception; 
 	
-	public long getMaxDayInterval();
-	
+
 }

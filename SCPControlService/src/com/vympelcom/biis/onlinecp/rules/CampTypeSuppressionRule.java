@@ -2,11 +2,14 @@ package com.vympelcom.biis.onlinecp.rules;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
 import com.vympelcom.biis.onlinecp.utils.GeneralUtils;
 
 public class CampTypeSuppressionRule {
 
+	static final Logger log = Logger.getLogger(CampTypeSuppressionRule.class);
 
 	private String histCampaign;
 	private String checkedCampaign;
@@ -39,12 +42,14 @@ public class CampTypeSuppressionRule {
 	
 	public CPCheckResult applyRule(Date historyDate, Date currentDate)
 	{
+		log.trace("Приеменяем правило CampTypeSuppressionRule "+toString());
 		CPCheckResult result = new CPCheckResult(true);
 		long factPeriodIndays = GeneralUtils.getDateDifferenceInDay(historyDate, currentDate);
-		if(countOfSuppresionDay>=factPeriodIndays)
+		if(countOfSuppresionDay>factPeriodIndays)
 		{
 			result = new CPCheckResult(false);
 		}
+		log.trace("Приеменяем правило CampTypeSuppressionRule "+toString());
 		return result;
 	}
 	

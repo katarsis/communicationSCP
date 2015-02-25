@@ -9,8 +9,8 @@ import com.vympelcom.biis.onlinecp.utils.GeneralUtils;
 
 public class MaxFrequencyRule {
 
-	private int campType;
 	private long countDayInPeriod;
+	
 	private int maxFrequency;
 	
 	public long getCountDayInPeriod() {
@@ -25,15 +25,8 @@ public class MaxFrequencyRule {
 	public void setMaxFrequency(int maxFrequency) {
 		this.maxFrequency = maxFrequency;
 	}
-	public int getCampType() {
-		return campType;
-	}
-	public void setCampType(int campType) {
-		this.campType = campType;
-	}
 	
-	public MaxFrequencyRule(int campType, long countDayInPeriod,int maxFrequency ) {
-		this.campType = campType;
+	public MaxFrequencyRule(long countDayInPeriod,int maxFrequency ) {
 		this.countDayInPeriod = countDayInPeriod;
 		this.maxFrequency = maxFrequency;
 	}
@@ -42,14 +35,19 @@ public class MaxFrequencyRule {
 	 * Проверям по истории контактов не было ли превышено количество коммуникаций за данный период
 	 */
 	public CPCheckResult applyRule(List<ContactHistoryRecord> previsiosCommunication, Date currentDate){
+		
+		//TODO логировать на trace-уровне. Применяем правило такое-то (параметры правила), Contact_id такой-то. Результат такой-то. 
+		
 		CPCheckResult result = new CPCheckResult(true);
+		
+		/*TODO заменить на переменную "количество контактов", которую инкрементировать*/
 		int localMaxFrequecy = maxFrequency;
 		
 		for(ContactHistoryRecord historyRecord: previsiosCommunication){
 			if(Long.compare(GeneralUtils.getDateDifferenceInDay(historyRecord.getContactDate(), currentDate),countDayInPeriod)<=0)
 			{
 					if(localMaxFrequecy>0)
-						maxFrequency --;
+						localMaxFrequecy --;
 					else
 					{
 						result = new CPCheckResult(false);
@@ -59,9 +57,9 @@ public class MaxFrequencyRule {
 		}
 		return result;
 	}
+	
 	@Override
 	public String toString() {
-		return "MaxFrequencyRule [campType=" + campType + ", countDayInPeriod="
-				+ countDayInPeriod + ", maxFrequency=" + maxFrequency + "]";
+		return "MaxFrequencyRule [countDayInPeriod=" + countDayInPeriod + ", maxFrequency=" + maxFrequency + "]";
 	}
 }

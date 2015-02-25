@@ -11,6 +11,8 @@ import org.apache.log4j.Logger;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
+//TODO переименовать в OnlineCPDatabaseConnection
+
 public class DatabaseConnection {
 
 	private Properties props;
@@ -22,6 +24,10 @@ public class DatabaseConnection {
     
 
     private DatabaseConnection() throws Exception {
+
+    /*TODO переделать на явный initialize. Т.е. у нас стартует сревлет, должен инициализовать все что ему нужно
+    	- не ждем первого контакта.*/
+    	
     	log.debug("Start initalization of DatabaseConnection");
         
         Connection testConnection = null;
@@ -31,9 +37,12 @@ public class DatabaseConnection {
 	        props = new Properties();
 	        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("/resuorce/datasource.properties");
 	        props.load(is);
-	        
+
+	        //TODO о чем эта запись в лог? Как ее трактовать администратору?*/
 	        log.debug("ComboPooledDataSource");
 	        cpds = new ComboPooledDataSource();
+	        
+	        //TODO логируется не то что нужно. Эти три метода провалиться не могут. Что гораздо интереснее логировать - собстьвенно, какие свойства прочитаны из конфига (значения)*/ 
 	        
 	        log.debug("setJdbcUrl");
 	        cpds.setJdbcUrl(props.getProperty("jdbcUrl"));
@@ -54,6 +63,7 @@ public class DatabaseConnection {
 		    testConnection = cpds.getConnection();
 		    testStatement = testConnection.createStatement();
 		    testStatement.executeQuery("select 1+1 from DUAL");
+		    //TODO вот это залогировать получше. "Тестируем..."   "Запрос select 1+1 from DUAL выполнен успешно"
 		    
 		    log.debug("Initalization of DatabaseConnection is sucessfuly ended");
         } catch (Exception e) {

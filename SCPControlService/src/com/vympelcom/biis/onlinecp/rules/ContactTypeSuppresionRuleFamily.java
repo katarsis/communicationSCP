@@ -79,15 +79,5 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 		return result;
 	}
 
-	@Override
-	public long getMaxDayInterval() {
-		long result = 0;
-		ArrayList<ContactTypeSuppresionRule> contactTypeRuleList = new ArrayList<ContactTypeSuppresionRule>(contactTypeRuleMatrix.values());
-		for(ContactTypeSuppresionRule selectedRule: contactTypeRuleList){
-			if(selectedRule.getSuppressionDay()>result)
-				result = selectedRule.getSuppressionDay();
-		}
-		return result;
-	}
-
+	
 }
