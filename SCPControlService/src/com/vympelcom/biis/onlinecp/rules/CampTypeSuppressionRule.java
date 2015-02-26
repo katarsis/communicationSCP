@@ -49,7 +49,7 @@ public class CampTypeSuppressionRule {
 		{
 			result = new CPCheckResult(false);
 		}
-		log.trace("Приеменяем правило CampTypeSuppressionRule "+toString());
+		log.trace("Результат применения правила CampTypeSuppressionRule "+result);
 		return result;
 	}
 	

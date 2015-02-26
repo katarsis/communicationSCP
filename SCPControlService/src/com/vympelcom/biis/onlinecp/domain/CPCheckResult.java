@@ -25,4 +25,12 @@ public class CPCheckResult
 		else
 			return COMMUNICATION_ABORTED;
 	}
+	
+	@Override
+	public String toString(){
+		if(isContactAllowed)
+			return "контакт разрешен";
+		else
+			return "контакт не разрешен";
+	}
 }

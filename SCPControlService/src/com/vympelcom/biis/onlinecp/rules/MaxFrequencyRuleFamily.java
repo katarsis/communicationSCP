@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
 import com.vympelcom.biis.onlinecp.domain.Campaign;
 import com.vympelcom.biis.onlinecp.domain.ContactHistoryRecord;
-import com.vympelcom.biis.onlinecp.utils.DatabaseConnection;
+import com.vympelcom.biis.onlinecp.utils.OnlineCPDatabaseConnection;
 
 public class MaxFrequencyRuleFamily implements RuleFamily
 {
@@ -23,7 +23,7 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 	
 	private List<MaxFrequencyRule> generateMaxFrequencyRuleMap() throws Exception{
 		List<MaxFrequencyRule> result = new ArrayList<MaxFrequencyRule>();
-		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
+		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.initalize();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();
@@ -33,11 +33,11 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 			while (rs.next()) {
 				MaxFrequencyRule  currentItem = new MaxFrequencyRule(rs.getLong("ANALYSIS_PERIOD"), rs.getInt("MAX_CONTACT_FREQUENCY"));  
 				result.add(currentItem);
-				log.info("Load MaxFrequencyRule: "+ currentItem.toString());
+				log.info("Загружено правило контактной политики MaxFrequencyRule: "+ currentItem.toString());
 			}
 		}catch(Exception exp)
 		{
-			log.fatal("Could not load MaxFrequencyRuleFamily: " + exp.getMessage());
+			log.fatal("Не возможно загрузить семейство правил контактной политики MaxFrequencyRuleFamily: " + exp.getMessage());
 		}finally{
 			connection.close();
 		}
@@ -45,9 +45,9 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 	}
 	
 	public MaxFrequencyRuleFamily() throws Exception{
-		log.debug("Start initalization of MaxFrequencyRuleFamily");
+		log.debug("Начало инициализации семейства правил контактной политики MaxFrequencyRuleFamily");
 		maxFrequencyRuleList = generateMaxFrequencyRuleMap();
-		log.debug("Initalization of MaxFrequencyRuleFamily is ended");
+		log.debug("Инициализация семейства правил контактной политики MaxFrequencyRuleFamily завершена");
 	}
 	
 	

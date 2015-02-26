@@ -3,7 +3,6 @@ package com.vympelcom.biis.onlinecp.rules;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +12,7 @@ import org.apache.log4j.Logger;
 import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
 import com.vympelcom.biis.onlinecp.domain.Campaign;
 import com.vympelcom.biis.onlinecp.domain.ContactHistoryRecord;
-import com.vympelcom.biis.onlinecp.utils.DatabaseConnection;
+import com.vympelcom.biis.onlinecp.utils.OnlineCPDatabaseConnection;
 
 public class CampTypeSuppressionRuleFamily implements RuleFamily{
 
@@ -24,7 +23,7 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 	
 	private HashMap<String,CampTypeSuppressionRule> generateSuppresionMapping() throws Exception {
 		HashMap<String,CampTypeSuppressionRule> result = new HashMap<String,CampTypeSuppressionRule>();
-		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
+		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.initalize();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();

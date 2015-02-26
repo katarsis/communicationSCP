@@ -2,6 +2,8 @@ package com.vympelcom.biis.onlinecp.rules;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
 import com.vympelcom.biis.onlinecp.domain.Campaign;
 import com.vympelcom.biis.onlinecp.utils.GeneralUtils;
@@ -13,6 +15,8 @@ public class ContactTypeSuppresionRule {
 	private int historyCampType;
 	private long suppressionDay;
 	private String baseDate;
+	
+	static final Logger log = Logger.getLogger(ContactTypeSuppresionRule.class);
 	
 	public int getCommunicationType() {
 		return communicationType;
@@ -56,12 +60,14 @@ public class ContactTypeSuppresionRule {
 	
 	public CPCheckResult applyRule(Campaign lastCompany,Date currentDate, Date lastContactDate){
 		CPCheckResult result = new CPCheckResult(true);
+		log.trace("Применяем правило ContactTypeSuppresionRule "+ toString());
 		if(baseDate.equals("offer_date"))
 			if(GeneralUtils.getDateDifferenceInDay(lastCompany.getOfferDate(), currentDate)<this.suppressionDay)
 				result = new CPCheckResult(false);
 		else if(baseDate.equals("inform_date"))
 			if(GeneralUtils.getDateDifferenceInDay(lastCompany.getInformDate(), currentDate)<this.suppressionDay)
 				result = new CPCheckResult(false);
+		log.trace("Результат применения правила ContactTypeSuppresionRule: "+result);
 		return result;
 	}
 	

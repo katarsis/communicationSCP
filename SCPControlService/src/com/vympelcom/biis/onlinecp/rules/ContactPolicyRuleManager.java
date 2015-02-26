@@ -1,7 +1,6 @@
 package com.vympelcom.biis.onlinecp.rules;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -15,13 +14,10 @@ import com.vympelcom.biis.onlinecp.domain.ContactHistoryRecord;
 import com.vympelcom.biis.onlinecp.utils.ClientLockDescriptor;
 import com.vympelcom.biis.onlinecp.utils.ClientLockManager;
 
-/*TODO: нружен ли он?*/
+
 
 public class ContactPolicyRuleManager {
 
-	/*TODO Нет.  На этом уровне уходит гибкость, работаем явно с тремя видами семейств правил*/
-	
-	/*В конструкторе: = new.... [3], и явно создать сами семьи, по конкретным именам классов*/
 	private static RuleFamily ruleFamilyCampTypeSuppression;
 	private static RuleFamily ruleFamilyMaxFrequency;
 	private static RuleFamily ruleFamilyContactType;
@@ -36,17 +32,18 @@ public class ContactPolicyRuleManager {
 	
 	public static ContactPolicyRuleManager getInstance() throws Exception{
 		log.info("Запуск инициализации правил контатконой политики");
-		if(ruleManager==null){
+		ContactPolicyRuleManager localRuleManager = ruleManager;
+		if(localRuleManager==null){
 			synchronized (ContactPolicyRuleManager.class) {
-				if(ruleManager==null){
-					ruleManager = new ContactPolicyRuleManager();
+				if(localRuleManager==null){
+					localRuleManager = new ContactPolicyRuleManager();
 					ruleFamilyCampTypeSuppression = new CampTypeSuppressionRuleFamily();
 					ruleFamilyList.add(ruleFamilyCampTypeSuppression);
 					ruleFamilyContactType = new ContactTypeSuppresionRuleFamily();
 					ruleFamilyList.add(ruleFamilyContactType);
 					ruleFamilyMaxFrequency = new MaxFrequencyRuleFamily();
 					ruleFamilyList.add(ruleFamilyMaxFrequency);
-						
+					ruleManager = localRuleManager;	
 				}
 			}
 		}
@@ -55,7 +52,7 @@ public class ContactPolicyRuleManager {
 	}
 	
 	
-	public CPCheckResult checkContactPolicyAndStoreContact (String ctn, int campaignId, int communicationType)
+	public CPCheckResult checkContactPolicyAndStoreContact (String ctn, int campaignId, int communicationType)throws Exception
 	{
 		Date currentDate =  new Date();
 		CPCheckResult resultApplyingAllRuleFamily = new CPCheckResult(true);
@@ -78,7 +75,8 @@ public class ContactPolicyRuleManager {
 				ContactHistoryDAO.writeRecordToContactHistory(newCommunicationRecord);
 			}
 		} catch (Exception e) {
-			log.error("Request with parameters: CTN:"+ctn+" camp_id:"+campaignId+" contact_type:"+communicationType+" is aborted: "+e.getMessage());
+			log.error("Контакт с параметрами : CTN:"+ctn+" camp_id:"+campaignId+" contact_type:"+communicationType+" ошибка обработки: "+e.getMessage());
+			throw e;
 		}finally{
 			ClientLockManager.RemoveClientLock(clientLockDescriptor);
 		}

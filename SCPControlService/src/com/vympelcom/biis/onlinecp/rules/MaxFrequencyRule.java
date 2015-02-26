@@ -3,12 +3,16 @@ package com.vympelcom.biis.onlinecp.rules;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
 import com.vympelcom.biis.onlinecp.domain.ContactHistoryRecord;
 import com.vympelcom.biis.onlinecp.utils.GeneralUtils;
 
 public class MaxFrequencyRule {
 
+	static final Logger log = Logger.getLogger(MaxFrequencyRule.class);
+	
 	private long countDayInPeriod;
 	
 	private int maxFrequency;
@@ -35,26 +39,20 @@ public class MaxFrequencyRule {
 	 * Проверям по истории контактов не было ли превышено количество коммуникаций за данный период
 	 */
 	public CPCheckResult applyRule(List<ContactHistoryRecord> previsiosCommunication, Date currentDate){
-		
-		//TODO логировать на trace-уровне. Применяем правило такое-то (параметры правила), Contact_id такой-то. Результат такой-то. 
-		
 		CPCheckResult result = new CPCheckResult(true);
-		
-		/*TODO заменить на переменную "количество контактов", которую инкрементировать*/
-		int localMaxFrequecy = maxFrequency;
+		log.trace("Применяем правило контактной политики MaxFrequencyRule " + toString());
+		int countContactInPeriod = 0;
 		
 		for(ContactHistoryRecord historyRecord: previsiosCommunication){
 			if(Long.compare(GeneralUtils.getDateDifferenceInDay(historyRecord.getContactDate(), currentDate),countDayInPeriod)<=0)
 			{
-					if(localMaxFrequecy>0)
-						localMaxFrequecy --;
-					else
-					{
-						result = new CPCheckResult(false);
-						break;
-					}
+				countContactInPeriod ++;
 			}
 		}
+		
+		if(countContactInPeriod>maxFrequency)
+			result.setContactAllowed(false);
+		log.trace("Результат применения правила контактной политики MaxFrequencyRule " + result);
 		return result;
 	}
 	

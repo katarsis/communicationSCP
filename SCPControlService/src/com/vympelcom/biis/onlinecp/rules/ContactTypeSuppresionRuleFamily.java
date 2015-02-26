@@ -3,7 +3,6 @@ package com.vympelcom.biis.onlinecp.rules;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +13,7 @@ import com.vympelcom.biis.onlinecp.dao.CampaignsDAO;
 import com.vympelcom.biis.onlinecp.domain.CPCheckResult;
 import com.vympelcom.biis.onlinecp.domain.Campaign;
 import com.vympelcom.biis.onlinecp.domain.ContactHistoryRecord;
-import com.vympelcom.biis.onlinecp.utils.DatabaseConnection;
+import com.vympelcom.biis.onlinecp.utils.OnlineCPDatabaseConnection;
 
 public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 
@@ -26,7 +25,7 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 	
 	private HashMap<String,ContactTypeSuppresionRule> generateRuleMatrix() throws Exception{
 		HashMap<String, ContactTypeSuppresionRule> result = new HashMap<String, ContactTypeSuppresionRule>();
-		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
+		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.initalize();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();
@@ -37,10 +36,11 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 				ContactTypeSuppresionRule  currentItem = new ContactTypeSuppresionRule(rs.getInt("CHECK_CAMPAIGN_TYPE"), rs.getInt("HISTORY_CAMPAIGN_TYPE"), rs.getLong("SUPPRESSION_INTERVAL_DAYS"), rs.getString("SUPPRESION_BASE_DATE"), rs.getInt("CONTACT_TYPE"));  
 				String matrixKey = String.valueOf(currentItem.getCampType())+ String.valueOf(currentItem.getHistoryCampType());
 				result.put(matrixKey,currentItem);
-				log.info("Load ContactTypeSuppresionRule "+currentItem.toString());
+				log.info("Загружено правило ContactTypeSuppresionRule :"+currentItem.toString());
 			}
 		}catch (Exception e) {
-			log.fatal("Could not load ContactTypeSuppresionRuleFamily:" + e.getMessage());
+			log.fatal("Не возможно загрузить правила ContactTypeSuppresionRuleFamily:" + e.getMessage());
+			throw e;
 		}finally{
 			connection.close();
 		}
@@ -48,17 +48,17 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 	}
 	
 	public ContactTypeSuppresionRuleFamily() throws Exception{
-		log.debug("Start initalization of ContactTypeSuppresionRuleFamily ");
+		log.debug("Запущена инициализация семейства правил контактной политики ContactTypeSuppresionRuleFamily ");
 		contactTypeRuleMatrix = generateRuleMatrix();				
-		log.debug("Initalization of ContactTypeSuppresionRuleFamily ended");
+		log.debug("Инициализация семейства правил контактной политики ContactTypeSuppresionRuleFamily окончена");
 	}
 	
 	@Override
-	public CPCheckResult applyRuleFamily(String ctn, Campaign checkedCampaign,List<ContactHistoryRecord> previousContacts)  {
+	public CPCheckResult applyRuleFamily(String ctn, Campaign checkedCampaign,List<ContactHistoryRecord> previousContacts)throws Exception  {
 		CPCheckResult result = new CPCheckResult(true);
 		Date currentDate =  new Date();
 		try {
-			if(!previousContacts.isEmpty()&&lastCommunicationIsVoice(previousContacts.get(0)))
+			if(!previousContacts.isEmpty()&&lastCommunicationIsVoice(previousContacts))
 			{
 				Campaign lastCommunicationCampaign = CampaignsDAO.getCampaignById(previousContacts.get(0).getCampaignId());
 				String index = String.valueOf(lastCommunicationCampaign.getCampaignType())+String.valueOf(checkedCampaign.getCampaignType());
@@ -66,15 +66,24 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 				result = selectedRule.applyRule(lastCommunicationCampaign,currentDate,previousContacts.get(0).getContactDate());
 			}
 		}catch (Exception e) {
-			e.printStackTrace();
+			log.error("Не удалось применить семейство правил к клиенту (ctn):" + ctn);
+			throw e;
 		}
 		
 		return result;
 	}
 	
-	public boolean lastCommunicationIsVoice(ContactHistoryRecord historyRecord){
+	public boolean lastCommunicationIsVoice(List<ContactHistoryRecord> previousContacts){
 		boolean result = false;
-		if(historyRecord.getContactType()==VOICE_CONTACT_TYPE)
+		ContactHistoryRecord lastHistoryRecord = previousContacts.get(0);
+		for(ContactHistoryRecord historyRecord: previousContacts){
+			if(lastHistoryRecord.getContactDate().compareTo(historyRecord.getContactDate())<0)
+			{
+				lastHistoryRecord = historyRecord;
+			}
+		}
+		
+		if(lastHistoryRecord.getContactType()==VOICE_CONTACT_TYPE)
 			result = true;
 		return result;
 	}

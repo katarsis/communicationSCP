@@ -48,7 +48,7 @@ public class SCPControlService {
 		CPCheckResult resultApplyingRule = new CPCheckResult(true);
 		ContactPolicyRuleManager contactPloicyRuleManager = ContactPolicyRuleManager.getInstance();
 		resultApplyingRule = contactPloicyRuleManager.checkContactPolicyAndStoreContact(ctn, camp_id, contact_type);
-		log.info("Запрос с параметрами CTN:"+ctn+" camp_id:"+camp_id+" contact_type:"+contact_type+" обработан, результат запроса:"+resultApplyingRule.isContactAllowedInt());
+		log.debug("Запрос с параметрами CTN:"+ctn+" camp_id:"+camp_id+" contact_type:"+contact_type+" обработан, результат запроса:"+resultApplyingRule.isContactAllowedInt());
 		return resultApplyingRule.isContactAllowedInt();
 	}
 }

@@ -9,7 +9,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.vympelcom.biis.onlinecp.domain.ContactHistoryRecord;
-import com.vympelcom.biis.onlinecp.utils.DatabaseConnection;
+import com.vympelcom.biis.onlinecp.utils.OnlineCPDatabaseConnection;
 
 public class ContactHistoryDAO {
 
@@ -18,34 +18,27 @@ public class ContactHistoryDAO {
 	
 	public static List<ContactHistoryRecord> getHistoryByClient(String ctn) throws Exception {
 		List<ContactHistoryRecord> result = new ArrayList<ContactHistoryRecord>();
-		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
+		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.initalize();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();
 			
-			//TODO сортировку перенести в java, в соответствующий рул. 
-			
 			//TODO добавить условие, что contact_date > (сейчас - константа в днях, которую берем из конфига - сейчас 720)
 			
-			CallableStatement callstmt = connection.prepareCall("select * from contact_history left join campaigns on contact_history.camp_id = campaigns.camp_id where ctn = ? order by contact_date desc");
+			CallableStatement callstmt = connection.prepareCall("select * from contact_history left join campaigns on contact_history.camp_id = campaigns.camp_id where ctn = ? ");
 			callstmt.setString(1,ctn);
 			ResultSet rs = callstmt.executeQuery();
+			
 			while (rs.next()) {
 				ContactHistoryRecord currentItem = new ContactHistoryRecord(rs.getString("ctn"),
 						rs.getDate("contact_date"), rs.getString("contact_type"),rs.getString("contact_source"), rs.getString("contact_id"),rs.getInt("camp_id"),rs.getInt("camp_type"));
 				result.add(currentItem);
-
-				//debug-логирование, сколько контактов загружено. По-русски.
-
-				//trace-логирование - полностью вывести все контакты прочитанные со всеми полями
-				
-				
+				log.trace("Загружена запись из истории контактов: "+currentItem);
 			}
+			log.debug("Загружено "+result.size()+" записей из истории контактов");
 		} catch (Exception e) {
-			//Избавляемся от английского языка, если им недостаточно владеем.
-			log.error("Could not get previous contacts by ctn: "+ctn+" "+e.getMessage());
-			
-			//TODO. Что дальше произойдет? Сейчас выйдем на разрешенный контакт. Должны выйти на ошибку в веб сервисе.
+			log.error("Не возможно загрузить историю контактов по клиенту: "+ctn+" "+e.getMessage());
+			throw e;
 		}finally{
 			connection.close();
 		}
@@ -53,7 +46,7 @@ public class ContactHistoryDAO {
 	}
 	
 	public static void writeRecordToContactHistory(ContactHistoryRecord savedRecord) throws Exception{
-		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
+		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.initalize();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();

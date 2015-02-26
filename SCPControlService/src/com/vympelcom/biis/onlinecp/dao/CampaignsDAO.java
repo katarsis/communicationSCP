@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import org.apache.log4j.Logger;
 
 import com.vympelcom.biis.onlinecp.domain.Campaign;
-import com.vympelcom.biis.onlinecp.utils.DatabaseConnection;
+import com.vympelcom.biis.onlinecp.utils.OnlineCPDatabaseConnection;
 
 public class CampaignsDAO {
 
@@ -15,7 +15,7 @@ public class CampaignsDAO {
 	
 	public static Campaign getCampaignById(int id) throws Exception {
 		Campaign result = null;
-		DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
+		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.initalize();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();
