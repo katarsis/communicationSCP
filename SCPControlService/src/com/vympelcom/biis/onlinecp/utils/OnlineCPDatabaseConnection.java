@@ -24,9 +24,6 @@ public class OnlineCPDatabaseConnection {
 
     private OnlineCPDatabaseConnection() throws Exception {
 
-    /*TODO переделать на явный initialize. Т.е. у нас стартует сревлет, должен инициализовать все что ему нужно
-    	- не ждем первого контакта.*/
-    	
     	log.info("Инициализация соединения с базой данных ");
         
         Connection testConnection = null;
@@ -71,11 +68,14 @@ public class OnlineCPDatabaseConnection {
     }
     
     
-    public static OnlineCPDatabaseConnection initalize() throws Exception {
-        if (datasource == null) {
+    public static OnlineCPDatabaseConnection getInstance() throws Exception {
+    	OnlineCPDatabaseConnection localDataSource = datasource;    	
+    	if (localDataSource == null) {
         	synchronized (OnlineCPDatabaseConnection.class) {
-        		if(datasource==null)
-        			datasource = new OnlineCPDatabaseConnection();
+        		if(localDataSource==null){
+        			localDataSource = new OnlineCPDatabaseConnection();
+        			datasource = localDataSource;
+        		}
                 return datasource;
 			}
          } else {

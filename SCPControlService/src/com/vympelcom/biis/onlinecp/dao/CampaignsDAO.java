@@ -15,7 +15,7 @@ public class CampaignsDAO {
 	
 	public static Campaign getCampaignById(int id) throws Exception {
 		Campaign result = null;
-		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.initalize();
+		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.getInstance();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();

@@ -23,7 +23,7 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 	
 	private List<MaxFrequencyRule> generateMaxFrequencyRuleMap() throws Exception{
 		List<MaxFrequencyRule> result = new ArrayList<MaxFrequencyRule>();
-		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.initalize();
+		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.getInstance();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();

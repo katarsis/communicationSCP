@@ -66,5 +66,13 @@ public class ContactHistoryRecord {
 		this.campaignId = campId;
 		this.campaignType = campaignType;
 	}
+	@Override
+	public String toString() {
+		return "ContactHistoryRecord [CTN=" + CTN + ", contactDate="
+				+ contactDate + ", contactType=" + contactType
+				+ ", contactSource=" + contactSource + ", id=" + id
+				+ ", campaignId=" + campaignId + ", campaignType="
+				+ campaignType + "]";
+	}
 	
 }

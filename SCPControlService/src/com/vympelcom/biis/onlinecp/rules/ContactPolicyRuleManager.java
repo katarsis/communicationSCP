@@ -31,7 +31,7 @@ public class ContactPolicyRuleManager {
 	}
 	
 	public static ContactPolicyRuleManager getInstance() throws Exception{
-		log.info("Запуск инициализации правил контатконой политики");
+		log.info("Запуск инициализации правил контактной политики");
 		ContactPolicyRuleManager localRuleManager = ruleManager;
 		if(localRuleManager==null){
 			synchronized (ContactPolicyRuleManager.class) {

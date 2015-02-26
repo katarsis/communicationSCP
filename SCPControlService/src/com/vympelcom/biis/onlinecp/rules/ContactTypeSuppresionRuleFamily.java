@@ -25,7 +25,7 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 	
 	private HashMap<String,ContactTypeSuppresionRule> generateRuleMatrix() throws Exception{
 		HashMap<String, ContactTypeSuppresionRule> result = new HashMap<String, ContactTypeSuppresionRule>();
-		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.initalize();
+		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.getInstance();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();

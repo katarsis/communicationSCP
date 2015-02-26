@@ -18,7 +18,7 @@ public class ContactHistoryDAO {
 	
 	public static List<ContactHistoryRecord> getHistoryByClient(String ctn) throws Exception {
 		List<ContactHistoryRecord> result = new ArrayList<ContactHistoryRecord>();
-		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.initalize();
+		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.getInstance();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();
@@ -46,7 +46,7 @@ public class ContactHistoryDAO {
 	}
 	
 	public static void writeRecordToContactHistory(ContactHistoryRecord savedRecord) throws Exception{
-		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.initalize();
+		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.getInstance();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();

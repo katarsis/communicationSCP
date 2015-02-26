@@ -23,7 +23,7 @@ public class CampTypeSuppressionRuleFamily implements RuleFamily{
 	
 	private HashMap<String,CampTypeSuppressionRule> generateSuppresionMapping() throws Exception {
 		HashMap<String,CampTypeSuppressionRule> result = new HashMap<String,CampTypeSuppressionRule>();
-		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.initalize();
+		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.getInstance();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();
