@@ -54,9 +54,8 @@ public class ContactTypeSuppresionRuleFamily implements RuleFamily{
 	}
 	
 	@Override
-	public CPCheckResult applyRuleFamily(String ctn, Campaign checkedCampaign,List<ContactHistoryRecord> previousContacts)throws Exception  {
+	public CPCheckResult applyRuleFamily(String ctn, Campaign checkedCampaign,List<ContactHistoryRecord> previousContacts, Date currentDate)throws Exception  {
 		CPCheckResult result = new CPCheckResult(true);
-		Date currentDate =  new Date();
 		try {
 			if(!previousContacts.isEmpty()&&lastCommunicationIsVoice(previousContacts))
 			{

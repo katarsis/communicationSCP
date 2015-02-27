@@ -27,6 +27,7 @@ public class ContextInitializer implements ServletContextListener  {
 		    PropertyConfigurator.configure(props);
 		    OnlineCPDatabaseConnection.getInstance();
 			ContactPolicyRuleManager.getInstance();
+			ServiceProperty.getInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

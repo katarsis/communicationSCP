@@ -3,30 +3,36 @@ package com.vympelcom.biis.onlinecp.dao;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLClientInfoException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import com.vympelcom.biis.onlinecp.domain.ContactHistoryRecord;
 import com.vympelcom.biis.onlinecp.utils.OnlineCPDatabaseConnection;
+import com.vympelcom.biis.onlinecp.utils.ServiceProperty;
 
 public class ContactHistoryDAO {
 
 	static final Logger log = Logger.getLogger(ContactHistoryDAO.class);
 		
 	
-	public static List<ContactHistoryRecord> getHistoryByClient(String ctn) throws Exception {
+	public static List<ContactHistoryRecord> getHistoryByClient(String ctn, Date currentDate) throws Exception {
 		List<ContactHistoryRecord> result = new ArrayList<ContactHistoryRecord>();
 		OnlineCPDatabaseConnection databaseConnection = OnlineCPDatabaseConnection.getInstance();
 		Connection connection=null;
 		try{
 			connection = databaseConnection.getConnection();
 			
-			//TODO добавить условие, что contact_date > (сейчас - константа в днях, которую берем из конфига - сейчас 720)
-			
-			CallableStatement callstmt = connection.prepareCall("select * from contact_history left join campaigns on contact_history.camp_id = campaigns.camp_id where ctn = ? ");
+			CallableStatement callstmt = connection.prepareCall("select * from contact_history left join campaigns on contact_history.camp_id = campaigns.camp_id where ctn = ? and contact_date > ?");
 			callstmt.setString(1,ctn);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(currentDate);
+			cal.add(Calendar.DATE, -1*Integer.valueOf(ServiceProperty.getProperty("max.period")));
+			callstmt.setDate(2,new java.sql.Date(cal.getTime().getTime()));
 			ResultSet rs = callstmt.executeQuery();
 			
 			while (rs.next()) {

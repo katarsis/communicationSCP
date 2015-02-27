@@ -40,6 +40,8 @@ public class MaxFrequencyRule {
 	 */
 	public CPCheckResult applyRule(List<ContactHistoryRecord> previsiosCommunication, Date currentDate){
 		CPCheckResult result = new CPCheckResult(true);
+		if(previsiosCommunication.isEmpty())
+			return result;
 		log.trace("Применяем правило контактной политики MaxFrequencyRule " + toString());
 		int countContactInPeriod = 0;
 		

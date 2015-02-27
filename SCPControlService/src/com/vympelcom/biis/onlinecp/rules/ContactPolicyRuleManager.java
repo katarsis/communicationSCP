@@ -31,10 +31,10 @@ public class ContactPolicyRuleManager {
 	}
 	
 	public static ContactPolicyRuleManager getInstance() throws Exception{
-		log.info("Запуск инициализации правил контактной политики");
 		ContactPolicyRuleManager localRuleManager = ruleManager;
 		if(localRuleManager==null){
 			synchronized (ContactPolicyRuleManager.class) {
+				log.info("Запуск инициализации правил контактной политики");log.info("Запуск инициализации правил контактной политики");
 				if(localRuleManager==null){
 					localRuleManager = new ContactPolicyRuleManager();
 					ruleFamilyCampTypeSuppression = new CampTypeSuppressionRuleFamily();
@@ -45,9 +45,9 @@ public class ContactPolicyRuleManager {
 					ruleFamilyList.add(ruleFamilyMaxFrequency);
 					ruleManager = localRuleManager;	
 				}
+				log.info("Инициализация правил контактной политики завершена");
 			}
 		}
-		log.info("Инициализация правил контактной политики завершена");
 		return ruleManager;
 	}
 	
@@ -59,10 +59,10 @@ public class ContactPolicyRuleManager {
 		ClientLockDescriptor clientLockDescriptor = null;
 		try {
 			clientLockDescriptor = ClientLockManager.GetClientLock(ctn);
-			List<ContactHistoryRecord> previousContacts = ContactHistoryDAO.getHistoryByClient(ctn);
+			List<ContactHistoryRecord> previousContacts = ContactHistoryDAO.getHistoryByClient(ctn,currentDate);
 			Campaign checkedCampaign = CampaignsDAO.getCampaignById(campaignId);
 			for(RuleFamily selectedRule: ruleFamilyList){
-				CPCheckResult resultApplyingRuleFamily = selectedRule.applyRuleFamily(ctn, checkedCampaign, previousContacts);
+				CPCheckResult resultApplyingRuleFamily = selectedRule.applyRuleFamily(ctn, checkedCampaign, previousContacts,currentDate);
 				if(!resultApplyingRuleFamily.isContactAllowed())
 				{
 					resultApplyingAllRuleFamily = resultApplyingRuleFamily;

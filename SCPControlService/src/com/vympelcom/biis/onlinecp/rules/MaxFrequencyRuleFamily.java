@@ -53,9 +53,8 @@ public class MaxFrequencyRuleFamily implements RuleFamily
 	
 	
 	@Override
-	public CPCheckResult applyRuleFamily(String ctn, Campaign checkedCampaign,List<ContactHistoryRecord> previousContacts){
+	public CPCheckResult applyRuleFamily(String ctn, Campaign checkedCampaign,List<ContactHistoryRecord> previousContacts,Date currentDate){
 		CPCheckResult result = new CPCheckResult(true);
-		Date currentDate =  new Date();
 		for(MaxFrequencyRule currentRule : maxFrequencyRuleList)
 		{
 			CPCheckResult localResult = currentRule.applyRule(previousContacts, currentDate);
