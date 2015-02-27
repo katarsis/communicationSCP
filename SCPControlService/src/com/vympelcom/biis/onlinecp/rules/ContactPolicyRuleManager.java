@@ -34,8 +34,8 @@ public class ContactPolicyRuleManager {
 		ContactPolicyRuleManager localRuleManager = ruleManager;
 		if(localRuleManager==null){
 			synchronized (ContactPolicyRuleManager.class) {
-				log.info("Запуск инициализации правил контактной политики");log.info("Запуск инициализации правил контактной политики");
 				if(localRuleManager==null){
+					log.info("Запуск инициализации правил контактной политики");
 					localRuleManager = new ContactPolicyRuleManager();
 					ruleFamilyCampTypeSuppression = new CampTypeSuppressionRuleFamily();
 					ruleFamilyList.add(ruleFamilyCampTypeSuppression);
@@ -43,18 +43,17 @@ public class ContactPolicyRuleManager {
 					ruleFamilyList.add(ruleFamilyContactType);
 					ruleFamilyMaxFrequency = new MaxFrequencyRuleFamily();
 					ruleFamilyList.add(ruleFamilyMaxFrequency);
-					ruleManager = localRuleManager;	
+					ruleManager = localRuleManager;
+					log.info("Инициализация правил контактной политики завершена");
 				}
-				log.info("Инициализация правил контактной политики завершена");
 			}
 		}
 		return ruleManager;
 	}
 	
 	
-	public CPCheckResult checkContactPolicyAndStoreContact (String ctn, int campaignId, int communicationType)throws Exception
+	public CPCheckResult checkContactPolicyAndStoreContact (String ctn, int campaignId, int communicationType, Date currentDate)throws Exception
 	{
-		Date currentDate =  new Date();
 		CPCheckResult resultApplyingAllRuleFamily = new CPCheckResult(true);
 		ClientLockDescriptor clientLockDescriptor = null;
 		try {

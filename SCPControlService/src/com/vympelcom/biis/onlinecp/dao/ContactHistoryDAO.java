@@ -3,7 +3,6 @@ package com.vympelcom.biis.onlinecp.dao;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLClientInfoException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -65,7 +64,8 @@ public class ContactHistoryDAO {
 			callstmt.executeQuery();
 
 		} catch (Exception e) {
-			log.error("Could not write contact in contact history "+ savedRecord.toString()+" "+e.getMessage());
+			log.error("Не возможно записать контакт в историю контактов "+ savedRecord.toString()+" "+e.getMessage());
+			throw e;
 		}finally{
 			connection.close();
 		}
